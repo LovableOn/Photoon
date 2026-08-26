@@ -63,6 +63,30 @@ invólucro.
 - Detalhe do álbum com capa, progresso, adicionar e remover fotos, renomear,
   marcar como pronto, finalizar e excluir.
 
+**Editor de álbum** (`/app/albuns/:id/editor`)
+
+- Canvas com lâmina aberta, vinco, margem de corte e área segura.
+- Arraste fotos da biblioteca para os quadros; arraste sobre a foto colocada
+  para reposicionar o recorte; alças para mover e redimensionar.
+- 14 layouts por quantidade de fotos, com o espaçamento em mm controlando o
+  respiro entre os quadros.
+- Texto com presets, elementos vetoriais recoloríveis e fundos por lâmina ou
+  para o álbum inteiro.
+- Inspetor com enquadramento, zoom, rotação, brilho, contraste, saturação e
+  preto e branco.
+- Storyboard com miniaturas reais, badges de estado, reordenar, duplicar e
+  excluir lâminas.
+- Desfazer e refazer (`Ctrl/Cmd + Z`), autosave e prévia sem ferramentas.
+- Revisão que bloqueia a finalização enquanto houver erro, com correção
+  automática por item.
+
+As verificações da revisão são calculadas de dados reais — dimensões do
+arquivo, tamanho físico do produto e geometria dos quadros: resolução efetiva
+de impressão em DPI, quadro sobre o vinco, foto repetida na lâmina, quadro sem
+foto e texto fora da área segura. **Não há detecção de rosto nem chamada a um
+modelo de IA nesta versão**; o painel de assistência aplica regras fixas de
+diagramação.
+
 **Painel** (`/app`)
 
 - Widgets com dados reais da biblioteca: fotos por dia, evolução do acervo,

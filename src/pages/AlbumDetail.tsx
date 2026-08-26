@@ -120,8 +120,14 @@ export function AlbumDetail() {
               <Icon.Trash className="size-[18px]" />
             </IconButton>
             {!isFinalized && (
+              <LinkButton to={`/app/albuns/${project.id}/editor`}>
+                <Icon.Sliders className="size-4" />
+                Abrir editor
+              </LinkButton>
+            )}
+            {!isFinalized && (
               <Button
-                variant={progress >= 100 ? 'primary' : 'white'}
+                variant="white"
                 onClick={async () => {
                   await updateProject(project.id, {
                     status: project.status === 'pronto' ? 'finalizado' : 'pronto',

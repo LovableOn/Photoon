@@ -11,6 +11,8 @@ import {
 import { put, putMany, readAll, remove, removeMany, uid } from './db'
 import { processImage, type Orientation } from './images'
 import { useAuth } from './auth'
+import type { Spread } from './editorTypes'
+import { buildSpreads } from './layouts'
 
 export interface Photo {
   id: string
@@ -55,6 +57,8 @@ export interface Project {
   elementIds: string[]
   coverPhotoId: string | null
   status: ProjectStatus
+  /** Lâminas do editor. Projetos criados antes do editor ganham as suas ao abrir. */
+  spreads: Spread[]
   createdAt: number
   updatedAt: number
 }
@@ -148,6 +152,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         .sort((a, b) => b.createdAt - a.createdAt)
       const myProjects = allProjects
         .filter((project) => project.owner === owner)
+        .map((project) =>
+          project.spreads?.length
+            ? project
+            : {
+                ...project,
+                spreads: buildSpreads(
+                  project.pages,
+                  project.photoIds,
+                  project.coverPhotoId,
+                ),
+              },
+        )
         .sort((a, b) => b.updatedAt - a.updatedAt)
 
       const nextThumbs: Record<string, string> = {}
@@ -379,6 +395,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         elementIds: [],
         coverPhotoId: input.photoIds[0] ?? null,
         status: input.photoIds.length ? 'em-edicao' : 'nao-iniciado',
+        spreads: buildSpreads(input.pages, input.photoIds, input.photoIds[0] ?? null),
         createdAt: now,
         updatedAt: now,
       }

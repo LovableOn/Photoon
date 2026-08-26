@@ -11,6 +11,7 @@ import { Dashboard } from './pages/Dashboard'
 import { Albums } from './pages/Albums'
 import { NewAlbum } from './pages/NewAlbum'
 import { AlbumDetail } from './pages/AlbumDetail'
+import { Editor } from './pages/Editor'
 import { Photos } from './pages/Photos'
 import { Elements } from './pages/Elements'
 import { Account } from './pages/Account'
@@ -81,6 +82,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AlbumDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/app/albuns/:projectId/editor"
+              element={
+                <ProtectedRoute>
+                  <Editor />
                 </ProtectedRoute>
               }
             />
