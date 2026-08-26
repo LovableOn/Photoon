@@ -1,27 +1,43 @@
-import { useState, type ReactNode } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { Logo } from './Logo'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { LogoMark } from './Logo'
+import { Avatar, IconButton, LinkIconButton } from './ui'
+import { Icon } from './icons'
 import { useAuth } from '../lib/auth'
+import { useStore } from '../lib/store'
 
-const NAV_ITEMS = [
+const NAV = [
   { to: '/app', label: 'Início', end: true },
-  { to: '/app/conta', label: 'Minha conta', end: false },
-  { to: '/app/ajuda', label: 'Ajuda', end: false },
+  { to: '/app/albuns', label: 'Álbuns', end: false },
+  { to: '/app/fotos', label: 'Fotos', end: false },
+  { to: '/app/elementos', label: 'Elementos', end: false },
 ]
 
-function initials(name: string) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('')
-}
+const RAIL = [
+  { to: '/app/albuns/novo', label: 'Novo álbum', icon: <Icon.Plus className="size-[18px]" /> },
+  { to: '/app/fotos', label: 'Fotos', icon: <Icon.Photos className="size-[18px]" /> },
+  { to: '/app/elementos', label: 'Elementos', icon: <Icon.Elements className="size-[18px]" /> },
+  { to: '/app/ajuda', label: 'Ajuda', icon: <Icon.Help className="size-[18px]" /> },
+  { to: '/app/conta', label: 'Minha conta', icon: <Icon.User className="size-[18px]" /> },
+]
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
+  const { photos } = useStore()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function onClick(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [menuOpen])
 
   function handleLogout() {
     logout()
@@ -29,22 +45,32 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-svh bg-bg">
-      <header className="sticky top-0 z-10 h-[72px] border-b border-border bg-surface">
-        <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-6">
-          <div className="flex items-center gap-8">
-            <Logo to="/app" />
-            <nav className="hidden items-center gap-1 sm:flex">
-              {NAV_ITEMS.map((item) => (
+    <div className="min-h-svh bg-canvas">
+      <header className="sticky top-0 z-30 bg-canvas/85 backdrop-blur-md">
+        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-5">
+            <Link
+              to="/app"
+              className="flex shrink-0 items-center gap-2.5"
+              aria-label="Photoon"
+            >
+              <LogoMark className="size-9" />
+              <span className="hidden text-xl font-bold tracking-tight text-ink lg:block">
+                Photoon
+              </span>
+            </Link>
+
+            <nav className="scrollbar-thin flex items-center gap-1 overflow-x-auto rounded-full border border-line/70 bg-surface p-1 shadow-float">
+              {NAV.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   end={item.end}
                   className={({ isActive }) =>
-                    `rounded-lg px-3 py-2 text-sm font-medium transition ${
+                    `shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition ${
                       isActive
-                        ? 'bg-bg text-primary'
-                        : 'text-ink-soft hover:bg-bg hover:text-ink'
+                        ? 'bg-ink text-white'
+                        : 'text-ink-soft hover:bg-subtle hover:text-ink'
                     }`
                   }
                 >
@@ -54,51 +80,142 @@ export function AppShell({ children }: { children: ReactNode }) {
             </nav>
           </div>
 
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setMenuOpen((v) => !v)}
-              className="flex items-center gap-2 rounded-full border border-border bg-surface py-1 pl-1 pr-3 text-sm font-medium text-ink hover:border-ink-faint"
-            >
-              <span className="flex size-7 items-center justify-center rounded-full bg-gradient-brand text-xs font-semibold text-white">
-                {user ? initials(user.name) : ''}
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="hidden items-center gap-2 rounded-full border border-line/70 bg-surface py-1.5 pr-4 pl-2 shadow-float xl:inline-flex">
+              <span className="flex size-7 items-center justify-center rounded-full bg-primary-soft text-[11px] font-bold text-primary">
+                {photos.length}
               </span>
-              {user?.name.split(' ')[0]}
-            </button>
+              <span className="text-[13px] font-medium text-ink-soft">
+                {photos.length === 1 ? 'foto' : 'fotos'}
+              </span>
+            </span>
 
-            {menuOpen && (
-              <div
-                className="absolute right-0 mt-2 w-48 overflow-hidden rounded-[14px] border border-border bg-surface py-1 shadow-card"
-                onMouseLeave={() => setMenuOpen(false)}
+            <IconButton label="Notificações">
+              <Icon.Bell className="size-[18px]" />
+            </IconButton>
+
+            <div className="relative" ref={menuRef}>
+              <button
+                type="button"
+                onClick={() => setMenuOpen((open) => !open)}
+                className="flex items-center gap-2 rounded-full border border-line/70 bg-surface py-1 pr-3 pl-1 shadow-float transition hover:border-ink/20"
               >
-                <NavLink
-                  to="/app/conta"
-                  onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-ink hover:bg-bg"
-                >
-                  Minha conta
-                </NavLink>
-                <NavLink
-                  to="/app/ajuda"
-                  onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-ink hover:bg-bg"
-                >
-                  Ajuda
-                </NavLink>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="block w-full px-4 py-2 text-left text-sm text-danger hover:bg-danger-bg"
-                >
-                  Sair
-                </button>
-              </div>
-            )}
+                <Avatar name={user?.name ?? ''} size={30} />
+                <span className="hidden text-[13px] font-semibold text-ink sm:block">
+                  {user?.name.split(' ')[0]}
+                </span>
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-2xl border border-line bg-surface py-1.5 shadow-lift">
+                  <div className="border-b border-line px-4 pt-2 pb-3">
+                    <p className="truncate text-sm font-semibold text-ink">
+                      {user?.name}
+                    </p>
+                    <p className="truncate text-xs text-ink-faint">{user?.email}</p>
+                  </div>
+                  <NavLink
+                    to="/app/conta"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink transition hover:bg-subtle"
+                  >
+                    <Icon.User className="size-4 text-ink-faint" />
+                    Minha conta
+                  </NavLink>
+                  <NavLink
+                    to="/app/ajuda"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink transition hover:bg-subtle"
+                  >
+                    <Icon.Help className="size-4 text-ink-faint" />
+                    Ajuda
+                  </NavLink>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2.5 border-t border-line px-4 py-2.5 text-left text-sm text-danger transition hover:bg-danger-soft"
+                  >
+                    <Icon.Logout className="size-4" />
+                    Sair
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>
+      {/* rail flutuante de ações rápidas */}
+      <aside className="fixed top-1/2 left-4 z-20 hidden -translate-y-1/2 lg:block">
+        <div className="flex flex-col items-center gap-1 rounded-full border border-line/70 bg-surface p-1.5 shadow-float">
+          {RAIL.map((item, index) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end
+              title={item.label}
+              aria-label={item.label}
+              className={({ isActive }) =>
+                `flex size-10 items-center justify-center rounded-full transition ${
+                  index === 0
+                    ? 'bg-brand text-white shadow-float hover:brightness-108'
+                    : isActive
+                      ? 'bg-ink text-white'
+                      : 'text-ink-faint hover:bg-subtle hover:text-ink'
+                }`
+              }
+            >
+              {item.icon}
+            </NavLink>
+          ))}
+        </div>
+      </aside>
+
+      <main className="mx-auto max-w-[1440px] px-4 pb-16 sm:px-6 lg:pl-24">
+        {children}
+      </main>
+    </div>
+  )
+}
+
+/** Cabeçalho de página: breadcrumb, título grande e ações à direita. */
+export function PageHeader({
+  breadcrumb,
+  title,
+  actions,
+  back,
+}: {
+  breadcrumb?: string[]
+  title: string
+  actions?: ReactNode
+  back?: string
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-4 pt-2 pb-8">
+      <div className="flex min-w-0 items-start gap-3">
+        {back && (
+          <LinkIconButton to={back} label="Voltar" className="mt-1.5 shadow-float">
+            <Icon.ArrowLeft className="size-[18px]" />
+          </LinkIconButton>
+        )}
+        <div className="min-w-0">
+          {breadcrumb && breadcrumb.length > 0 && (
+            <nav className="mb-1.5 flex items-center gap-1.5 text-[12px] text-ink-faint">
+              {breadcrumb.map((crumb, index) => (
+                <span key={crumb} className="flex items-center gap-1.5">
+                  {index > 0 && <span aria-hidden="true">/</span>}
+                  {crumb}
+                </span>
+              ))}
+            </nav>
+          )}
+          <h1 className="truncate text-[32px] leading-tight font-bold tracking-tight text-ink sm:text-[38px]">
+            {title}
+          </h1>
+        </div>
+      </div>
+
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
   )
 }

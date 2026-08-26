@@ -1,76 +1,81 @@
-import { useState, type InputHTMLAttributes } from 'react'
+import { useState, type InputHTMLAttributes, type ReactNode } from 'react'
 
-interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string
   error?: string
   hint?: string
+  icon?: ReactNode
 }
 
-export function FormField({ label, error, hint, id, ...props }: FormFieldProps) {
+function fieldClass(error?: string, hasIcon?: boolean, hasAction?: boolean) {
+  return `h-12 w-full rounded-2xl border bg-subtle text-sm text-ink transition placeholder:text-ink-faint focus:bg-surface focus:outline-none focus:ring-4 ${
+    hasIcon ? 'pl-11' : 'pl-4'
+  } ${hasAction ? 'pr-12' : 'pr-4'} ${
+    error
+      ? 'border-danger/40 focus:border-danger focus:ring-danger/10'
+      : 'border-line focus:border-primary focus:ring-primary/10'
+  }`
+}
+
+export function FormField({ label, error, hint, icon, id, ...props }: FieldProps) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-ink">
+      <label htmlFor={id} className="mb-2 block text-[13px] font-semibold text-ink">
         {label}
       </label>
-      <input
-        id={id}
-        className={`h-11 w-full rounded-xl border bg-surface px-4 text-sm text-ink placeholder:text-ink-faint transition focus:outline-none focus:ring-2 ${
-          error
-            ? 'border-danger focus:border-danger focus:ring-danger-bg'
-            : 'border-border focus:border-primary focus:ring-primary/15'
-        }`}
-        aria-invalid={Boolean(error)}
-        {...props}
-      />
+      <div className="relative">
+        {icon && (
+          <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-ink-faint">
+            {icon}
+          </span>
+        )}
+        <input
+          id={id}
+          className={fieldClass(error, Boolean(icon))}
+          aria-invalid={Boolean(error)}
+          {...props}
+        />
+      </div>
       {error ? (
-        <p className="mt-1.5 text-sm text-danger">{error}</p>
+        <p className="mt-1.5 text-[13px] text-danger">{error}</p>
       ) : hint ? (
-        <p className="mt-1.5 text-sm text-ink-faint">{hint}</p>
+        <p className="mt-1.5 text-[13px] text-ink-faint">{hint}</p>
       ) : null}
     </div>
   )
 }
 
-export function PasswordField({
-  label,
-  error,
-  hint,
-  id,
-  ...props
-}: FormFieldProps) {
+export function PasswordField({ label, error, hint, icon, id, ...props }: FieldProps) {
   const [visible, setVisible] = useState(false)
 
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-ink">
+      <label htmlFor={id} className="mb-2 block text-[13px] font-semibold text-ink">
         {label}
       </label>
       <div className="relative">
+        {icon && (
+          <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-ink-faint">
+            {icon}
+          </span>
+        )}
         <input
           id={id}
           type={visible ? 'text' : 'password'}
-          className={`h-11 w-full rounded-xl border bg-surface px-4 pr-11 text-sm text-ink placeholder:text-ink-faint transition focus:outline-none focus:ring-2 ${
-            error
-              ? 'border-danger focus:border-danger focus:ring-danger-bg'
-              : 'border-border focus:border-primary focus:ring-primary/15'
-          }`}
+          className={fieldClass(error, Boolean(icon), true)}
           aria-invalid={Boolean(error)}
           {...props}
         />
         <button
           type="button"
-          onClick={() => setVisible((v) => !v)}
-          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-ink-faint hover:text-ink-soft"
+          onClick={() => setVisible((current) => !current)}
+          className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-ink-faint transition hover:text-ink"
           aria-label={visible ? 'Ocultar senha' : 'Mostrar senha'}
           title={visible ? 'Ocultar senha' : 'Mostrar senha'}
         >
           {visible ? (
             <svg viewBox="0 0 20 20" fill="none" className="size-5">
-              <path
-                d="M2.5 10.5S5 5 10 5s7.5 5.5 7.5 5.5-2.5 5.5-7.5 5.5S2.5 10.5 2.5 10.5Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
+              <path d="M2.5 10.5S5 5 10 5s7.5 5.5 7.5 5.5-2.5 5.5-7.5 5.5S2.5 10.5 2.5 10.5Z" stroke="currentColor" strokeWidth="1.5" />
               <circle cx="10" cy="10.5" r="2.25" stroke="currentColor" strokeWidth="1.5" />
             </svg>
           ) : (
@@ -86,10 +91,32 @@ export function PasswordField({
         </button>
       </div>
       {error ? (
-        <p className="mt-1.5 text-sm text-danger">{error}</p>
+        <p className="mt-1.5 text-[13px] text-danger">{error}</p>
       ) : hint ? (
-        <p className="mt-1.5 text-sm text-ink-faint">{hint}</p>
+        <p className="mt-1.5 text-[13px] text-ink-faint">{hint}</p>
       ) : null}
     </div>
+  )
+}
+
+export function Checkbox({
+  label,
+  id,
+  className = '',
+  ...props
+}: InputHTMLAttributes<HTMLInputElement> & { label: string }) {
+  return (
+    <label
+      htmlFor={id}
+      className={`flex cursor-pointer items-center gap-2.5 text-[13px] text-ink-soft ${className}`}
+    >
+      <input
+        id={id}
+        type="checkbox"
+        className="size-4 rounded-md border-line text-primary focus:ring-2 focus:ring-primary/25"
+        {...props}
+      />
+      {label}
+    </label>
   )
 }

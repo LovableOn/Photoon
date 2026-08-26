@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
 import { FormField, PasswordField } from '../components/FormField'
-import { Button } from '../components/Button'
+import { Button, LinkButton } from '../components/ui'
 import { useAuth } from '../lib/auth'
 
 export function ResetPassword() {
@@ -33,11 +33,11 @@ export function ResetPassword() {
     try {
       await resetPassword(email, password)
       setDone(true)
-    } catch (err) {
+    } catch (caught) {
       setError(
-        err instanceof Error
-          ? err.message
-          : 'Não foi possível redefinir a senha agora. Tente novamente.',
+        caught instanceof Error
+          ? caught.message
+          : 'Não foi possível redefinir a senha. Tente de novo.',
       )
     } finally {
       setLoading(false)
@@ -48,11 +48,11 @@ export function ResetPassword() {
     return (
       <AuthLayout
         title="Senha redefinida"
-        subtitle="Sua senha foi alterada com sucesso. Você já pode entrar com a nova senha."
+        subtitle="Tudo certo. Você já pode entrar com a nova senha."
       >
-        <Link to="/login">
-          <Button>Voltar para entrar</Button>
-        </Link>
+        <LinkButton to="/login" size="lg" block>
+          Ir para o login
+        </LinkButton>
       </AuthLayout>
     )
   }
@@ -62,11 +62,11 @@ export function ResetPassword() {
       title="Criar nova senha"
       subtitle="Escolha uma nova senha para acessar sua conta."
     >
-      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
         {error && (
           <div
             role="alert"
-            className="rounded-xl border border-danger/20 bg-danger-bg px-4 py-2.5 text-sm text-danger"
+            className="rounded-2xl border border-danger/20 bg-danger-soft px-4 py-3 text-[13px] text-danger"
           >
             {error}
           </div>
@@ -79,7 +79,7 @@ export function ResetPassword() {
           autoComplete="email"
           placeholder="voce@exemplo.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(event) => setEmail(event.target.value)}
           required
         />
 
@@ -89,7 +89,7 @@ export function ResetPassword() {
           autoComplete="new-password"
           placeholder="Mínimo de 8 caracteres"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(event) => setPassword(event.target.value)}
           required
         />
 
@@ -99,16 +99,16 @@ export function ResetPassword() {
           autoComplete="new-password"
           placeholder="Repita a nova senha"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          onChange={(event) => setConfirmPassword(event.target.value)}
           required
         />
 
-        <Button type="submit" loading={loading}>
+        <Button type="submit" size="lg" block loading={loading}>
           Redefinir senha
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-ink-soft">
+      <p className="mt-8 text-center text-sm text-ink-soft">
         <Link to="/login" className="font-semibold text-primary hover:underline">
           Voltar para entrar
         </Link>

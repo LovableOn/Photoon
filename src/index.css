@@ -3,40 +3,47 @@
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  /* Superfícies e fundo */
-  --color-bg: #f4f7fc;
+  /* Superfícies */
+  --color-canvas: #eef2f8;
   --color-surface: #ffffff;
-  --color-canvas: #e8edf5;
+  --color-subtle: #f5f7fb;
+  --color-inset: #eff3f9;
 
   /* Texto */
   --color-ink: #0b1220;
   --color-ink-soft: #46536a;
-  --color-ink-faint: #6b7a90;
+  --color-ink-faint: #8593a8;
 
   /* Marca */
   --color-primary: #2563eb;
-  --color-primary-600: #1d4ed8;
+  --color-primary-soft: #dbe6fe;
   --color-secondary: #06b6d4;
+  --color-accent: #7c3aed;
 
   /* Bordas e estado */
-  --color-border: #e6eaf2;
+  --color-line: #e6eaf2;
   --color-success: #059669;
-  --color-success-bg: #ecfdf5;
+  --color-success-soft: #ecfdf5;
   --color-warning: #f59e0b;
-  --color-warning-bg: #fffbeb;
+  --color-warning-soft: #fffbeb;
   --color-danger: #e11d48;
-  --color-danger-bg: #fff1f2;
+  --color-danger-soft: #fff1f2;
 
-  --shadow-card: 0 1px 2px rgba(11, 18, 32, 0.04), 0 8px 24px -12px rgba(11, 18, 32, 0.12);
+  --radius-card: 24px;
+  --radius-tile: 16px;
+
+  --shadow-float: 0 1px 2px rgba(11, 18, 32, 0.04), 0 12px 32px -16px rgba(11, 18, 32, 0.18);
+  --shadow-lift: 0 2px 4px rgba(11, 18, 32, 0.05), 0 24px 48px -20px rgba(11, 18, 32, 0.28);
 }
 
 @layer base {
   html {
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
 
   body {
-    background-color: var(--color-bg);
+    background-color: var(--color-canvas);
     color: var(--color-ink);
   }
 
@@ -44,10 +51,28 @@
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
   }
+
+  /* Tipografia de números grandes: tabular e apertada */
+  .numeric {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+  }
 }
 
 @layer utilities {
-  .bg-gradient-brand {
+  .bg-brand {
     background-image: linear-gradient(135deg, #2563eb, #06b6d4);
+  }
+
+  .text-brand {
+    background-image: linear-gradient(135deg, #2563eb, #06b6d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line) transparent;
   }
 }

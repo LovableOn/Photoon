@@ -1,20 +1,18 @@
-import { Link } from 'react-router-dom'
 import { Logo } from '../components/Logo'
+import { LinkButton } from '../components/ui'
 
 export function NotFound() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-bg px-6 text-center">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-5 bg-canvas px-6 text-center">
       <Logo />
-      <h1 className="text-2xl font-bold text-ink">Página não encontrada</h1>
-      <p className="text-ink-soft">
-        A página que você procura não existe ou foi movida.
-      </p>
-      <Link
-        to="/"
-        className="rounded-xl bg-gradient-brand px-5 py-2.5 font-semibold text-white shadow-card"
-      >
-        Voltar para o início
-      </Link>
+      <div>
+        <p className="numeric text-[64px] leading-none font-bold text-brand">404</p>
+        <h1 className="mt-3 text-xl font-bold text-ink">Página não encontrada</h1>
+        <p className="mt-1.5 text-sm text-ink-soft">
+          O endereço que você abriu não existe ou foi movido.
+        </p>
+      </div>
+      <LinkButton to="/app">Voltar para o início</LinkButton>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { Spinner } from './ui'
 import { useAuth } from '../lib/auth'
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -8,8 +9,8 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-bg">
-        <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <div className="flex min-h-svh items-center justify-center bg-canvas text-primary">
+        <Spinner className="size-7" />
       </div>
     )
   }

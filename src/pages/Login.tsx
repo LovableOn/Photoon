@@ -1,9 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
-import { FormField, PasswordField } from '../components/FormField'
-import { Checkbox } from '../components/Checkbox'
-import { Button } from '../components/Button'
+import { Checkbox, FormField, PasswordField } from '../components/FormField'
+import { Button } from '../components/ui'
 import { useAuth } from '../lib/auth'
 
 export function Login() {
@@ -27,7 +26,7 @@ export function Login() {
       await login(email, password)
       navigate(from, { replace: true })
     } catch {
-      setError('E-mail ou senha incorretos. Confira os dados e tente novamente.')
+      setError('E-mail ou senha incorretos. Confira os dados e tente de novo.')
     } finally {
       setLoading(false)
     }
@@ -35,14 +34,14 @@ export function Login() {
 
   return (
     <AuthLayout
-      title="Acesse seus projetos"
-      subtitle="Entre com os dados fornecidos pela sua empresa."
+      title="Entre na sua conta"
+      subtitle="Acesse sua biblioteca e continue de onde parou."
     >
-      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
         {error && (
           <div
             role="alert"
-            className="rounded-xl border border-danger/20 bg-danger-bg px-4 py-2.5 text-sm text-danger"
+            className="rounded-2xl border border-danger/20 bg-danger-soft px-4 py-3 text-[13px] text-danger"
           >
             {error}
           </div>
@@ -55,7 +54,7 @@ export function Login() {
           autoComplete="email"
           placeholder="voce@exemplo.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(event) => setEmail(event.target.value)}
           required
         />
 
@@ -65,34 +64,34 @@ export function Login() {
           autoComplete="current-password"
           placeholder="Sua senha"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(event) => setPassword(event.target.value)}
           required
         />
 
         <div className="flex items-center justify-between">
           <Checkbox
             id="keepConnected"
-            label="Manter conectado neste dispositivo"
+            label="Manter conectado"
             checked={keepConnected}
-            onChange={(e) => setKeepConnected(e.target.checked)}
+            onChange={(event) => setKeepConnected(event.target.checked)}
           />
           <Link
             to="/esqueci-senha"
-            className="shrink-0 text-sm font-semibold text-primary hover:underline"
+            className="text-[13px] font-semibold text-primary transition hover:text-primary/80"
           >
             Esqueci minha senha
           </Link>
         </div>
 
-        <Button type="submit" loading={loading}>
+        <Button type="submit" size="lg" block loading={loading}>
           Entrar
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-ink-soft">
-        Ainda não tem uma conta?{' '}
+      <p className="mt-8 text-center text-sm text-ink-soft">
+        Ainda não tem conta?{' '}
         <Link to="/cadastro" className="font-semibold text-primary hover:underline">
-          Cadastre-se
+          Criar conta grátis
         </Link>
       </p>
     </AuthLayout>

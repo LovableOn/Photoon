@@ -2,14 +2,13 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
 import { FormField, PasswordField } from '../components/FormField'
-import { Button } from '../components/Button'
+import { Button } from '../components/ui'
 import { useAuth } from '../lib/auth'
 
 interface FieldErrors {
   name?: string
   email?: string
   password?: string
-  confirmPassword?: string
 }
 
 export function Register() {
@@ -19,21 +18,19 @@ export function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [errors, setErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  function validate(): boolean {
-    const errors: FieldErrors = {}
-    if (!name.trim()) errors.name = 'Informe seu nome.'
-    if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = 'Informe um e-mail válido.'
-    if (password.length < 8)
-      errors.password = 'A senha deve ter pelo menos 8 caracteres.'
-    if (confirmPassword !== password)
-      errors.confirmPassword = 'As senhas não coincidem.'
-    setFieldErrors(errors)
-    return Object.keys(errors).length === 0
+  const strength = password.length >= 12 ? 3 : password.length >= 8 ? 2 : password ? 1 : 0
+
+  function validate() {
+    const next: FieldErrors = {}
+    if (!name.trim()) next.name = 'Informe seu nome.'
+    if (!/^\S+@\S+\.\S+$/.test(email)) next.email = 'Informe um e-mail válido.'
+    if (password.length < 8) next.password = 'Use pelo menos 8 caracteres.'
+    setErrors(next)
+    return Object.keys(next).length === 0
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -45,11 +42,11 @@ export function Register() {
     try {
       await register(name.trim(), email, password)
       navigate('/app', { replace: true })
-    } catch (err) {
+    } catch (error) {
       setFormError(
-        err instanceof Error
-          ? err.message
-          : 'Não foi possível criar sua conta agora. Tente novamente em instantes.',
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível criar sua conta agora. Tente de novo em instantes.',
       )
     } finally {
       setLoading(false)
@@ -58,15 +55,14 @@ export function Register() {
 
   return (
     <AuthLayout
-      title="Criar sua conta"
-      subtitle="Preencha os dados abaixo para acessar seus projetos."
-      supportCard={false}
+      title="Crie sua conta"
+      subtitle="Leva menos de um minuto para começar a montar seus álbuns."
     >
-      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
         {formError && (
           <div
             role="alert"
-            className="rounded-xl border border-danger/20 bg-danger-bg px-4 py-2.5 text-sm text-danger"
+            className="rounded-2xl border border-danger/20 bg-danger-soft px-4 py-3 text-[13px] text-danger"
           >
             {formError}
           </div>
@@ -78,8 +74,8 @@ export function Register() {
           autoComplete="name"
           placeholder="Seu nome"
           value={name}
-          onChange={(e) => setName(e.target.value)}
-          error={fieldErrors.name}
+          onChange={(event) => setName(event.target.value)}
+          error={errors.name}
         />
 
         <FormField
@@ -89,42 +85,57 @@ export function Register() {
           autoComplete="email"
           placeholder="voce@exemplo.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          error={fieldErrors.email}
+          onChange={(event) => setEmail(event.target.value)}
+          error={errors.email}
         />
 
-        <PasswordField
-          id="password"
-          label="Senha"
-          autoComplete="new-password"
-          placeholder="Mínimo de 8 caracteres"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={fieldErrors.password}
-        />
+        <div>
+          <PasswordField
+            id="password"
+            label="Senha"
+            autoComplete="new-password"
+            placeholder="Mínimo de 8 caracteres"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            error={errors.password}
+          />
+          {password && !errors.password && (
+            <div className="mt-2.5 flex items-center gap-2">
+              <div className="flex flex-1 gap-1">
+                {[1, 2, 3].map((level) => (
+                  <span
+                    key={level}
+                    className={`h-1 flex-1 rounded-full transition ${
+                      level <= strength
+                        ? strength === 3
+                          ? 'bg-success'
+                          : strength === 2
+                            ? 'bg-warning'
+                            : 'bg-danger'
+                        : 'bg-inset'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-[11px] text-ink-faint">
+                {strength === 3 ? 'Forte' : strength === 2 ? 'Média' : 'Fraca'}
+              </span>
+            </div>
+          )}
+        </div>
 
-        <PasswordField
-          id="confirmPassword"
-          label="Confirmar senha"
-          autoComplete="new-password"
-          placeholder="Repita sua senha"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          error={fieldErrors.confirmPassword}
-        />
-
-        <Button type="submit" loading={loading}>
+        <Button type="submit" size="lg" block loading={loading}>
           Criar conta
         </Button>
 
-        <p className="text-center text-xs text-ink-faint">
+        <p className="text-center text-[11px] leading-relaxed text-ink-faint">
           Ao continuar, você concorda com os Termos de Uso e a Política de
-          Privacidade.
+          Privacidade da Photoon.
         </p>
       </form>
 
       <p className="mt-6 text-center text-sm text-ink-soft">
-        Já tem uma conta?{' '}
+        Já tem conta?{' '}
         <Link to="/login" className="font-semibold text-primary hover:underline">
           Entrar
         </Link>
