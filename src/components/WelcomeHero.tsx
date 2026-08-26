@@ -32,7 +32,7 @@ export function WelcomeHero({
   const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite'
 
   return (
-    <section className="relative overflow-hidden rounded-[28px] bg-ink">
+    <section className="relative overflow-hidden rounded-[28px] bg-navy-deep">
       {/* fundo */}
       {backgroundUrl ? (
         <img
@@ -45,10 +45,10 @@ export function WelcomeHero({
         <div className="absolute inset-0 bg-brand" />
       )}
 
-      {/* Véu só do lado do texto: escurece o suficiente para ler e deixa a
-          foto respirar à direita, que é onde ela aparece de verdade. */}
-      <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/55 to-ink/5" />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/45 to-transparent" />
+      {/* Véu azul da marca, não preto: escurece o suficiente para o texto ler
+          e mantém a foto com cor, em vez de apagá-la em cinza. */}
+      <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/92 via-navy/60 to-navy/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/50 to-transparent" />
 
       <div className="relative flex flex-col gap-8 px-7 py-9 sm:px-10 sm:py-11 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-xl">

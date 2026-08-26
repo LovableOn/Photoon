@@ -61,7 +61,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               aria-label="Photoon"
             >
               <LogoMark className="size-9" />
-              <span className="hidden text-xl font-bold tracking-tight text-ink lg:block">
+              <span className="hidden font-sans text-[21px] leading-none font-extrabold tracking-[-0.035em] text-ink lg:block">
                 Photoon
               </span>
             </Link>

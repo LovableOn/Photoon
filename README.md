@@ -79,8 +79,17 @@ invólucro.
   para reposicionar o recorte; alças para mover e redimensionar.
 - 14 layouts por quantidade de fotos, com o espaçamento em mm controlando o
   respiro entre os quadros.
-- Texto com presets, elementos vetoriais recoloríveis e fundos por lâmina ou
-  para o álbum inteiro.
+- Texto com presets e **50 elementos decorativos** originais em nove
+  categorias (corações, molduras, arabescos, florais, fitas, selos, formas,
+  linhas, data e local), todos recoloríveis.
+- **19 texturas de fundo** repetíveis (corações, matelassê, arabescos,
+  geométricos, delicados), com cor do fundo e cor do desenho escolhidas à
+  parte. O tamanho do padrão sai em porcentagem da lâmina, então miniatura,
+  canvas e prévia mostram o mesmo desenho.
+- **Seletor de cor completo** em todo lugar que pede cor: área de saturação
+  para arrastar, faixa de matiz, campo hexadecimal e atalhos.
+- O inspetor da direita recolhe numa faixa e volta sozinho quando você
+  seleciona um objeto.
 - Inspetor com enquadramento, zoom, rotação, brilho, contraste, saturação e
   preto e branco.
 - Storyboard com miniaturas reais, badges de estado, reordenar, duplicar e

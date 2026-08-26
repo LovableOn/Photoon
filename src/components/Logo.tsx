@@ -28,6 +28,11 @@ export function LogoMark({ className = 'size-9' }: { className?: string }) {
   )
 }
 
+/**
+ * Marca. O texto usa Plus Jakarta Sans — a mesma família do produto —
+ * em peso 800 com entreletra fechada, que é o que dá cara de logotipo e não
+ * de título comum.
+ */
 export function Logo({
   to = '/',
   className,
@@ -41,7 +46,7 @@ export function Logo({
       className={`inline-flex items-center gap-2.5 ${className ?? ''}`}
     >
       <LogoMark />
-      <span className="text-xl font-bold tracking-tight text-ink">
+      <span className="font-sans text-[21px] leading-none font-extrabold tracking-[-0.035em] text-ink">
         Photoon
       </span>
     </Link>

@@ -1,4 +1,5 @@
 import { Badge, Button } from '../ui'
+import { ColorPicker } from '../ColorPicker'
 import { Icon } from '../icons'
 import type {
   ElementItem,
@@ -166,8 +167,9 @@ export function Inspector({
 
   return (
     <div className="scrollbar-thin flex h-full flex-col overflow-y-auto">
-      <div className="flex items-center justify-between gap-2 px-5 pt-5 pb-3">
-        <h2 className="text-base font-bold text-ink">
+      {/* pl-12 abre espaço para o botão de recolher, que flutua neste canto */}
+      <div className="flex items-center justify-between gap-2 pt-5 pr-5 pb-3 pl-12">
+        <h2 className="truncate text-base font-bold text-ink">
           {frame ? 'Foto selecionada' : text ? 'Texto' : element ? 'Elemento' : 'Lâmina'}
         </h2>
         {photo && <Badge tone="brand">{photo.name}</Badge>}
@@ -391,20 +393,11 @@ export function Inspector({
           </Section>
 
           <Section title="Cor">
-            <div className="flex flex-wrap gap-2">
-              {['#0b1220', '#46536a', '#ffffff', '#2563eb', '#06b6d4', '#7c3aed'].map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => onUpdateText(text.id, { color })}
-                  aria-label={`Cor ${color}`}
-                  className={`size-8 rounded-full border-2 transition ${
-                    text.color === color ? 'border-ink' : 'border-line hover:scale-110'
-                  }`}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </div>
+            <ColorPicker
+              label="Cor do texto"
+              value={text.color}
+              onChange={(color) => onUpdateText(text.id, { color })}
+            />
 
             <Button size="sm" variant="danger" block className="mt-4" onClick={onRemove}>
               <Icon.Trash className="size-4" />
@@ -417,19 +410,12 @@ export function Inspector({
       {element && (
         <>
           <Section title="Aparência">
-            <div className="mb-3 flex flex-wrap gap-2">
-              {['#2563eb', '#06b6d4', '#7c3aed', '#0b1220', '#8593a8', '#ffffff'].map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => onUpdateElement(element.id, { color })}
-                  aria-label={`Cor ${color}`}
-                  className={`size-8 rounded-full border-2 transition ${
-                    element.color === color ? 'border-ink' : 'border-line hover:scale-110'
-                  }`}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
+            <div className="mb-4">
+              <ColorPicker
+                label="Cor do elemento"
+                value={element.color}
+                onChange={(color) => onUpdateElement(element.id, { color })}
+              />
             </div>
 
             <Slider

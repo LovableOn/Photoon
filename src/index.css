@@ -19,6 +19,9 @@
   --color-primary-soft: #dbe6fe;
   --color-secondary: #06b6d4;
   --color-accent: #7c3aed;
+  /* Azul profundo para véus sobre foto — no lugar do preto, que apagava a imagem. */
+  --color-navy: #0b2559;
+  --color-navy-deep: #061a42;
 
   /* Bordas e estado */
   --color-line: #e6eaf2;

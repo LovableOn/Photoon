@@ -1,6 +1,13 @@
 import { useMemo, useState } from 'react'
 import { Badge, Button, Chip } from '../ui'
+import { ColorPicker } from '../ColorPicker'
 import { Icon } from '../icons'
+import {
+  PATTERNS,
+  PATTERN_CATEGORIES,
+  patternCss,
+  patternPreviewCss,
+} from '../../lib/patterns'
 import { LAYOUTS, layoutsFor, type Layout } from '../../lib/layouts'
 import { makeText, type Spread, type TextBox } from '../../lib/editorTypes'
 import { BUILTIN_ELEMENTS, ELEMENT_CATEGORIES } from '../../lib/builtinElements'
@@ -394,40 +401,122 @@ export function BackgroundsPanel({
   onApply: (background: string | null) => void
   onApplyAll: (background: string | null) => void
 }) {
-  const [tab, setTab] = useState<'cores' | 'gradientes'>('cores')
-  const options = tab === 'cores' ? SOLID_BACKGROUNDS : GRADIENTS
+  const [tab, setTab] = useState<'cores' | 'gradientes' | 'texturas'>('texturas')
+  const [categoria, setCategoria] = useState<(typeof PATTERN_CATEGORIES)[number]>('Corações')
+  const [fundo, setFundo] = useState('#fdeef4')
+  const [traco, setTraco] = useState('#e8a3bd')
+  const [texturaAtiva, setTexturaAtiva] = useState<string | null>(null)
+
+  const texturas = PATTERNS.filter((pattern) => pattern.category === categoria)
+
+  /** Reaplica a textura escolhida sempre que uma das duas cores muda. */
+  function aplicarTextura(patternId: string, bg = fundo, ink = traco) {
+    const pattern = PATTERNS.find((item) => item.id === patternId)
+    if (!pattern) return
+    setTexturaAtiva(patternId)
+    onApply(patternCss(pattern, bg, ink))
+  }
 
   return (
     <Panel title="Fundos" subtitle="Aplique na lâmina atual ou no álbum inteiro">
       <div className="mb-3 flex gap-1.5">
-        <Chip active={tab === 'cores'} onClick={() => setTab('cores')} className="h-7 px-3 text-[11px]">
-          Cores
-        </Chip>
-        <Chip active={tab === 'gradientes'} onClick={() => setTab('gradientes')} className="h-7 px-3 text-[11px]">
-          Gradientes
-        </Chip>
-      </div>
-
-      <div className="grid grid-cols-4 gap-2">
-        {options.map((background) => (
-          <button
-            key={background}
-            type="button"
-            onClick={() => onApply(background)}
-            aria-label={`Aplicar fundo ${background}`}
-            className={`aspect-square rounded-xl border-2 transition ${
-              current === background ? 'border-primary' : 'border-line hover:border-primary/50'
-            }`}
-            style={{ background }}
-          />
+        {(['texturas', 'cores', 'gradientes'] as const).map((item) => (
+          <Chip
+            key={item}
+            active={tab === item}
+            onClick={() => setTab(item)}
+            className="h-7 px-3 text-[11px] capitalize"
+          >
+            {item}
+          </Chip>
         ))}
       </div>
+
+      {tab === 'texturas' ? (
+        <>
+          <div className="mb-3 flex flex-wrap gap-1.5">
+            {PATTERN_CATEGORIES.map((item) => (
+              <Chip
+                key={item}
+                active={categoria === item}
+                onClick={() => setCategoria(item)}
+                className="h-7 px-2.5 text-[11px]"
+              >
+                {item}
+              </Chip>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            {texturas.map((pattern) => (
+              <button
+                key={pattern.id}
+                type="button"
+                onClick={() => aplicarTextura(pattern.id)}
+                title={pattern.name}
+                aria-label={`Aplicar ${pattern.name}`}
+                className={`aspect-square rounded-xl border-2 transition hover:scale-[1.03] ${
+                  texturaAtiva === pattern.id ? 'border-primary' : 'border-line'
+                }`}
+                style={{ background: patternPreviewCss(pattern, fundo, traco) }}
+              />
+            ))}
+          </div>
+
+          <div className="mt-4 space-y-4 rounded-2xl bg-subtle p-3.5">
+            <ColorPicker
+              label="Cor do fundo"
+              value={fundo}
+              onChange={(cor) => {
+                setFundo(cor)
+                if (texturaAtiva) aplicarTextura(texturaAtiva, cor, traco)
+              }}
+            />
+            <div className="border-t border-line pt-4">
+              <ColorPicker
+                label="Cor do desenho"
+                value={traco}
+                onChange={(cor) => {
+                  setTraco(cor)
+                  if (texturaAtiva) aplicarTextura(texturaAtiva, fundo, cor)
+                }}
+              />
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="grid grid-cols-4 gap-2">
+          {(tab === 'cores' ? SOLID_BACKGROUNDS : GRADIENTS).map((background) => (
+            <button
+              key={background}
+              type="button"
+              onClick={() => {
+                setTexturaAtiva(null)
+                onApply(background)
+              }}
+              aria-label={`Aplicar fundo ${background}`}
+              className={`aspect-square rounded-xl border-2 transition ${
+                current === background ? 'border-primary' : 'border-line hover:border-primary/50'
+              }`}
+              style={{ background }}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="mt-4 space-y-2">
         <Button size="sm" variant="white" block onClick={() => onApplyAll(current)}>
           Aplicar ao álbum inteiro
         </Button>
-        <Button size="sm" variant="ghost" block onClick={() => onApply(null)}>
+        <Button
+          size="sm"
+          variant="ghost"
+          block
+          onClick={() => {
+            setTexturaAtiva(null)
+            onApply(null)
+          }}
+        >
           Remover fundo
         </Button>
       </div>
@@ -447,34 +536,71 @@ export function ElementsPanel({
   onInsert: (elementId: string, color: string) => void
 }) {
   const [category, setCategory] = useState<string>('todos')
-  const [color, setColor] = useState('#2563eb')
+  const [search, setSearch] = useState('')
+  const [color, setColor] = useState('#e8a3bd')
+  const [pickerOpen, setPickerOpen] = useState(false)
 
-  const visible =
-    category === 'todos'
-      ? BUILTIN_ELEMENTS
-      : BUILTIN_ELEMENTS.filter((element) => element.category === category)
+  const term = search.trim().toLowerCase()
 
-  const visibleCustom =
-    category === 'todos'
-      ? customElements
-      : customElements.filter((element) => element.category === category)
+  const visible = BUILTIN_ELEMENTS.filter((element) => {
+    if (category !== 'todos' && element.category !== category) return false
+    if (!term) return true
+    return (
+      element.name.toLowerCase().includes(term) ||
+      element.tags.some((tag) => tag.includes(term))
+    )
+  })
+
+  const visibleCustom = customElements.filter((element) => {
+    if (category !== 'todos' && element.category !== category) return false
+    if (!term) return true
+    return element.name.toLowerCase().includes(term)
+  })
 
   return (
     <Panel title="Elementos" subtitle="Clique para inserir na lâmina">
-      <div className="mb-3 flex items-center gap-1.5 rounded-xl bg-subtle px-3 py-2">
-        <span className="text-[11px] font-medium text-ink-faint">Cor</span>
-        {['#2563eb', '#06b6d4', '#7c3aed', '#0b1220', '#ffffff'].map((swatch) => (
-          <button
-            key={swatch}
-            type="button"
-            onClick={() => setColor(swatch)}
-            aria-label={`Cor ${swatch}`}
-            className={`size-5 rounded-full border transition ${
-              color === swatch ? 'border-ink ring-2 ring-ink' : 'border-line hover:scale-110'
-            }`}
-            style={{ backgroundColor: swatch }}
-          />
-        ))}
+      {/* cor, com o seletor completo a um clique */}
+      <button
+        type="button"
+        onClick={() => setPickerOpen((open) => !open)}
+        aria-expanded={pickerOpen}
+        className="mb-3 flex w-full items-center gap-2.5 rounded-xl border border-line bg-subtle px-3 py-2.5 text-left transition hover:border-primary"
+      >
+        <span
+          className="size-7 shrink-0 rounded-lg border border-black/10"
+          style={{ backgroundColor: color }}
+        />
+        <span className="min-w-0 flex-1">
+          <span className="block text-[12px] font-semibold text-ink">Cor do elemento</span>
+          <span className="block font-mono text-[11px] tracking-wide text-ink-faint uppercase">
+            {color}
+          </span>
+        </span>
+        <svg
+          viewBox="0 0 20 20"
+          fill="none"
+          className={`size-4 shrink-0 text-ink-faint transition-transform ${pickerOpen ? 'rotate-180' : ''}`}
+        >
+          <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {pickerOpen && (
+        <div className="mb-3 rounded-2xl bg-subtle p-3.5">
+          <ColorPicker label="Escolha a cor" value={color} onChange={setColor} />
+        </div>
+      )}
+
+      <div className="relative mb-3">
+        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-faint">
+          <Icon.Search className="size-4" />
+        </span>
+        <input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Buscar elemento"
+          className="h-10 w-full rounded-xl border border-line bg-subtle pr-3 pl-9 text-[13px] text-ink placeholder:text-ink-faint focus:border-primary focus:bg-white focus:outline-none"
+        />
       </div>
 
       <div className="mb-3 flex flex-wrap gap-1.5">
@@ -493,38 +619,44 @@ export function ElementsPanel({
         ))}
       </div>
 
-      <div className="grid grid-cols-4 gap-2">
-        {visible.map((element) => (
-          <button
-            key={element.id}
-            type="button"
-            onClick={() => onInsert(element.id, color)}
-            title={element.name}
-            className="aspect-square rounded-xl border border-line bg-white p-2 transition hover:border-primary"
-            style={{ color }}
-          >
-            <svg
-              viewBox="0 0 100 100"
-              className="size-full"
-              dangerouslySetInnerHTML={{ __html: element.svg }}
-              aria-label={element.name}
-              role="img"
-            />
-          </button>
-        ))}
+      {visible.length === 0 && visibleCustom.length === 0 ? (
+        <p className="py-8 text-center text-[13px] text-ink-faint">
+          Nenhum elemento nesta busca.
+        </p>
+      ) : (
+        <div className="grid grid-cols-3 gap-2">
+          {visible.map((element) => (
+            <button
+              key={element.id}
+              type="button"
+              onClick={() => onInsert(element.id, color)}
+              title={element.name}
+              className="aspect-square rounded-xl border border-line bg-white p-2.5 transition hover:-translate-y-0.5 hover:border-primary hover:shadow-float"
+              style={{ color }}
+            >
+              <svg
+                viewBox="0 0 100 100"
+                className="size-full"
+                dangerouslySetInnerHTML={{ __html: element.svg }}
+                aria-label={element.name}
+                role="img"
+              />
+            </button>
+          ))}
 
-        {visibleCustom.map((element) => (
-          <button
-            key={element.id}
-            type="button"
-            onClick={() => onInsert(element.id, color)}
-            title={element.name}
-            className="aspect-square rounded-xl border border-line bg-white p-2 transition hover:border-primary"
-          >
-            <img src={elementUrls[element.id]} alt={element.name} className="size-full object-contain" />
-          </button>
-        ))}
-      </div>
+          {visibleCustom.map((element) => (
+            <button
+              key={element.id}
+              type="button"
+              onClick={() => onInsert(element.id, color)}
+              title={element.name}
+              className="aspect-square rounded-xl border border-line bg-white p-2.5 transition hover:-translate-y-0.5 hover:border-primary hover:shadow-float"
+            >
+              <img src={elementUrls[element.id]} alt={element.name} className="size-full object-contain" />
+            </button>
+          ))}
+        </div>
+      )}
     </Panel>
   )
 }

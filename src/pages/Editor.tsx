@@ -70,6 +70,7 @@ export function Editor() {
   const [future, setFuture] = useState<Spread[][]>([])
   const [saveState, setSaveState] = useState<'salvo' | 'salvando'>('salvo')
   const [storyOpen, setStoryOpen] = useState(true)
+  const [inspectorOpen, setInspectorOpen] = useState(true)
   const [allPagesOpen, setAllPagesOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [reviewOpen, setReviewOpen] = useState(false)
@@ -110,6 +111,11 @@ export function Editor() {
   }, [project])
 
   useEffect(() => () => areaObserver.current?.disconnect(), [])
+
+  // Selecionar um objeto abre o inspetor: é ali que estão as propriedades dele.
+  useEffect(() => {
+    if (selection) setInspectorOpen(true)
+  }, [selection])
 
   /* --------------------------------------------------------- salvar */
 
@@ -740,21 +746,67 @@ export function Editor() {
           />
         </main>
 
-        {/* inspetor */}
+        {/* Inspetor recolhível: fechado deixa uma faixa à vista, para o usuário
+            saber que existe algo ali. Selecionar um objeto abre sozinho. */}
         {spread && (
-          <aside className="hidden w-[288px] shrink-0 border-l border-line bg-white xl:block">
-            <Inspector
-              spread={spread}
-              selection={selection}
-              photos={photoMap}
-              issues={spreadIssues}
-              onUpdateFrame={updateFrame}
-              onUpdateText={updateText}
-              onUpdateElement={updateElement}
-              onUpdateSpread={(patch) => updateCurrent((item) => ({ ...item, ...patch }))}
-              onRemove={removeSelected}
-              onApplyFix={applyFix}
-            />
+          <aside
+            className={`relative hidden shrink-0 overflow-hidden border-l border-line bg-white transition-[width] duration-300 ease-out motion-reduce:transition-none xl:block ${
+              inspectorOpen ? 'w-[300px]' : 'w-12'
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => setInspectorOpen((open) => !open)}
+              aria-expanded={inspectorOpen}
+              aria-label={inspectorOpen ? 'Recolher o inspetor' : 'Expandir o inspetor'}
+              title={inspectorOpen ? 'Recolher' : 'Expandir'}
+              className="absolute top-4 left-2 z-10 flex size-8 items-center justify-center rounded-full border border-line bg-surface text-ink-soft transition hover:border-primary hover:text-primary"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                className={`size-4 transition-transform duration-300 ${inspectorOpen ? '' : 'rotate-180'}`}
+              >
+                <path d="M12 4 6 10l6 6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            {/* faixa da versão recolhida */}
+            <div
+              className={`absolute inset-0 flex flex-col items-center pt-16 transition-opacity duration-200 ${
+                inspectorOpen ? 'pointer-events-none opacity-0' : 'opacity-100 delay-150'
+              }`}
+            >
+              <span
+                className="text-[11px] font-semibold tracking-[0.14em] text-ink-faint uppercase"
+                style={{ writingMode: 'vertical-rl' }}
+              >
+                {selection ? 'Editar seleção' : 'Inspetor'}
+              </span>
+              {selection && (
+                <span className="mt-3 size-2 rounded-full bg-primary" aria-hidden="true" />
+              )}
+            </div>
+
+            {/* conteúdo em largura fixa, para não espremer durante a animação */}
+            <div
+              className={`h-full w-[300px] transition-opacity duration-200 ${
+                inspectorOpen ? 'opacity-100 delay-100' : 'pointer-events-none opacity-0'
+              }`}
+            >
+              <Inspector
+                spread={spread}
+                selection={selection}
+                photos={photoMap}
+                issues={spreadIssues}
+                onUpdateFrame={updateFrame}
+                onUpdateText={updateText}
+                onUpdateElement={updateElement}
+                onUpdateSpread={(patch) => updateCurrent((item) => ({ ...item, ...patch }))}
+                onRemove={removeSelected}
+                onApplyFix={applyFix}
+              />
+            </div>
           </aside>
         )}
       </div>
