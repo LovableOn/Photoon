@@ -6,10 +6,29 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { SEED_STORE_NAME, makeAvatar } from './seedGallery'
+
+/**
+ * Níveis de acesso.
+ *
+ * - `admin`: administra a plataforma inteira.
+ * - `lojista`: o estúdio ou loja que vende o álbum. É quem cadastra as fotos,
+ *   os elementos e os clientes.
+ * - `cliente`: quem monta o álbum com as fotos liberadas pela loja.
+ *
+ * O app hoje entrega as telas do cliente; o papel já existe no modelo para
+ * que as áreas de admin e lojista entrem sem migração de dados.
+ */
+export type Role = 'admin' | 'lojista' | 'cliente'
 
 export interface User {
   name: string
   email: string
+  role: Role
+  /** Retrato do cliente, cadastrado pela loja junto com o acesso. */
+  avatar: string | null
+  /** Loja responsável pelo acesso deste cliente. */
+  store: string | null
 }
 
 interface StoredUser extends User {
@@ -24,6 +43,7 @@ interface AuthContextValue {
   logout: () => void
   requestPasswordReset: (email: string) => Promise<void>
   resetPassword: (email: string, password: string) => Promise<void>
+  updateProfile: (patch: Partial<Pick<User, 'name' | 'avatar'>>) => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -76,7 +96,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(SESSION_KEY)
-      if (raw) setUser(JSON.parse(raw) as User)
+      if (raw) {
+        const saved = JSON.parse(raw) as Partial<User> & { name: string; email: string }
+        setUser({
+          name: saved.name,
+          email: saved.email,
+          role: saved.role ?? 'cliente',
+          avatar: saved.avatar ?? null,
+          store: saved.store ?? SEED_STORE_NAME,
+        })
+      }
     } catch {
       // sessão inválida, ignora
     }
@@ -96,7 +125,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!found || found.password !== password) {
           throw new Error('E-mail ou senha incorretos.')
         }
-        const session: User = { name: found.name, email: found.email }
+        const session: User = {
+          name: found.name,
+          email: found.email,
+          role: found.role ?? 'cliente',
+          avatar: found.avatar ?? null,
+          store: found.store ?? SEED_STORE_NAME,
+        }
         writeKey(SESSION_KEY, JSON.stringify(session))
         setUser(session)
       },
@@ -110,15 +145,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ) {
           throw new Error('Já existe uma conta com este e-mail.')
         }
-        const newUser: StoredUser = { name, email, password }
+        // O retrato viria do cadastro feito pela loja; aqui ele é gerado para
+        // o acesso já nascer com a cara do cliente.
+        const avatar = await makeAvatar(name)
+        const newUser: StoredUser = {
+          name,
+          email,
+          password,
+          role: 'cliente',
+          avatar,
+          store: SEED_STORE_NAME,
+        }
         writeUsers([...users, newUser])
-        const session: User = { name, email }
+        const session: User = { name, email, role: 'cliente', avatar, store: SEED_STORE_NAME }
         writeKey(SESSION_KEY, JSON.stringify(session))
         setUser(session)
       },
       logout() {
         removeKey(SESSION_KEY)
         setUser(null)
+      },
+      updateProfile(patch) {
+        if (!user) return
+        const next: User = { ...user, ...patch }
+        const users = readUsers()
+        const index = users.findIndex(
+          (candidate) => candidate.email.toLowerCase() === user.email.toLowerCase(),
+        )
+        if (index !== -1) {
+          users[index] = { ...users[index], ...patch }
+          writeUsers(users)
+        }
+        writeKey(SESSION_KEY, JSON.stringify(next))
+        setUser(next)
       },
       async requestPasswordReset(_email) {
         await delay()

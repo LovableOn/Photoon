@@ -45,17 +45,26 @@ invólucro.
 
 **Fotos** (`/app/fotos`)
 
-- Envio por botão ou arrastando arquivos sobre a grade.
-- Miniatura gerada no navegador, dimensões e orientação detectadas
-  automaticamente (vertical, horizontal, quadrada, panorâmica).
-- Filtros, busca, ordenação, favoritas, seleção múltipla, preview em tela cheia
-  e exclusão em lote.
+- A galeria vem da **loja**: no primeiro acesso, 42 fotos de um casamento são
+  liberadas para o cliente, classificadas por momento (making of, cerimônia,
+  retratos, hora dourada, hora azul, festa).
+- O cliente também pode **enviar fotos próprias**, por botão ou arrastando
+  sobre a grade. Só as próprias podem ser excluídas — arquivo da loja não se
+  apaga por aqui.
+- Três modos de visualização: miniaturas grandes, miniaturas pequenas e lista.
+- Filtros por origem, momento, orientação, favoritas e uso; busca por nome;
+  ordenação por data, nome, tamanho e resolução.
+- **Busca por semelhança**: envie uma foto de referência e a galeria se
+  reordena pelas mais parecidas, com a afinidade em cada miniatura.
 
-**Elementos** (`/app/elementos`)
+**Elementos** (`/app/elementos`) — nível loja
 
 - Biblioteca curada de 33 elementos vetoriais (formas, linhas, molduras,
   ícones, selos, etiquetas, data e localização), recoloríveis na hora.
 - Envio de elementos próprios em SVG, PNG ou WebP, organizados por categoria.
+- **Cadastrar elemento é trabalho do lojista**, não de quem monta o álbum: a
+  rota exige papel `admin` ou `lojista` e não aparece no menu do cliente. O
+  cliente usa os elementos dentro do editor, no painel próprio.
 
 **Álbuns** (`/app/albuns`)
 
@@ -91,6 +100,39 @@ diagramação.
 
 - Widgets com dados reais da biblioteca: fotos por dia, evolução do acervo,
   composição por orientação e resumo geral.
+
+## Níveis de acesso
+
+O modelo tem três papéis (`src/lib/auth.tsx`):
+
+| Papel | Quem é | O que faz |
+|---|---|---|
+| `admin` | dono da plataforma | administra tudo |
+| `lojista` | estúdio ou loja que vende o álbum | cadastra fotos, elementos e clientes |
+| `cliente` | quem recebe as fotos | escolhe as fotos e monta o álbum |
+
+As telas entregues hoje são as do **cliente**. As áreas de admin e lojista
+ainda não existem, mas o papel já está no modelo e as rotas já respeitam ele —
+`/app/elementos` só abre para `admin` e `lojista`.
+
+## Galeria de exemplo
+
+No primeiro acesso, a loja "libera" 42 fotos de um casamento. Elas são
+**geradas no navegador**, não fotografias reais: o ambiente onde o projeto foi
+montado bloqueia bancos de imagem. Veja `scripts/seed-fotos.md` para trocar
+por fotos de verdade.
+
+## Busca por semelhança, e o que ela não é
+
+A busca compara uma **assinatura perceptual** calculada no navegador
+(`src/lib/similarity.ts`): a imagem reduzida a 12×12 em tons de cinza,
+normalizada pela média, mais uma grade 4×4 de cor média. Acha fotos da mesma
+cena, da mesma sequência, da mesma luz.
+
+**Não é reconhecimento facial** — não identifica pessoas. Para "ache todas as
+fotos desta pessoa" seria preciso um modelo de detecção e um vetor de rosto,
+rodando no servidor. A interface diz isso ao usuário em vez de prometer o que
+não entrega.
 
 ## Armazenamento
 

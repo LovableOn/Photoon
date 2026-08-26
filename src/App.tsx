@@ -101,10 +101,12 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            {/* Cadastrar elementos é trabalho da loja, não de quem monta o
+                álbum — o cliente usa os elementos dentro do editor. */}
             <Route
               path="/app/elementos"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute roles={['admin', 'lojista']}>
                   <Elements />
                 </ProtectedRoute>
               }

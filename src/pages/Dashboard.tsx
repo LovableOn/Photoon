@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
-import { AppShell, PageHeader } from '../components/AppShell'
+import { AppShell } from '../components/AppShell'
 import { Card, IconButton, LinkButton, Spinner } from '../components/ui'
 import { BarChart, Breakdown, LineChart } from '../components/charts'
 import { ProjectCard } from '../components/ProjectCard'
+import { WelcomeHero } from '../components/WelcomeHero'
 import { Icon } from '../components/icons'
 import { useAuth } from '../lib/auth'
 import { useStore } from '../lib/store'
 import { formatBytes } from '../lib/images'
-import { BUILTIN_ELEMENTS } from '../lib/builtinElements'
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
@@ -19,7 +19,24 @@ function startOfDay(date: Date) {
 
 export function Dashboard() {
   const { user } = useAuth()
-  const { photos, elements, projects, isLoading } = useStore()
+  const { photos, projects, isLoading, thumbUrls, seeding } = useStore()
+
+  /**
+   * Fundo da hero: uma foto da própria cobertura. Prefere favorita e deitada,
+   * que é o que preenche uma faixa larga sem cortar o assunto.
+   */
+  const heroPhotoUrl = useMemo(() => {
+    const deitada = (photo: (typeof photos)[number]) =>
+      photo.orientation === 'horizontal' || photo.orientation === 'panoramica'
+
+    const escolhida =
+      photos.find((photo) => photo.favorite && deitada(photo)) ??
+      photos.find(deitada) ??
+      photos.find((photo) => photo.favorite) ??
+      photos[0]
+
+    return escolhida ? (thumbUrls[escolhida.id] ?? null) : null
+  }, [photos, thumbUrls])
 
   const stats = useMemo(() => {
     const today = startOfDay(new Date())
@@ -70,10 +87,10 @@ export function Dashboard() {
       addedThisWeek: weekly.reduce((sum, day) => sum + day.value, 0),
       totalBytes: photos.reduce((sum, photo) => sum + photo.size, 0),
       favorites: photos.filter((photo) => photo.favorite).length,
+      fromStore: photos.filter((photo) => photo.origin === 'loja').length,
     }
   }, [photos])
 
-  const firstName = user?.name.split(' ')[0] ?? ''
   const recentProjects = projects.slice(0, 4)
 
   if (isLoading) {
@@ -88,33 +105,40 @@ export function Dashboard() {
 
   return (
     <AppShell>
-      <PageHeader
-        breadcrumb={['Biblioteca', 'Visão geral']}
-        title={`Olá, ${firstName}`}
-        actions={
-          <>
-            <IconButton label="Buscar">
-              <Icon.Search className="size-[18px]" />
-            </IconButton>
-            <IconButton label="Filtros">
-              <Icon.Sliders className="size-[18px]" />
-            </IconButton>
-            <LinkButton to="/app/fotos" variant="white">
-              <Icon.Upload className="size-4" />
-              Enviar fotos
-            </LinkButton>
-            <LinkButton to="/app/albuns/novo">
-              <Icon.Plus className="size-4" />
-              Novo álbum
-            </LinkButton>
-          </>
-        }
-      />
+      <div className="pt-2 pb-6">
+        <WelcomeHero
+          name={user?.name ?? ''}
+          avatar={user?.avatar ?? null}
+          store={user?.store ?? null}
+          gallery={photos.find((photo) => photo.gallery)?.gallery ?? null}
+          backgroundUrl={heroPhotoUrl}
+          photoCount={photos.length}
+          albumCount={projects.length}
+          seeding={seeding}
+        />
+      </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
-        <HeroCard photoCount={photos.length} />
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-ink">Sua biblioteca</h2>
+          <p className="mt-0.5 text-sm text-ink-soft">
+            O que a loja liberou e o que você já enviou.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <LinkButton to="/app/fotos" variant="white" size="sm">
+            <Icon.Upload className="size-4" />
+            Enviar minhas fotos
+          </LinkButton>
+          <LinkButton to="/app/albuns/novo" size="sm">
+            <Icon.Plus className="size-4" />
+            Novo álbum
+          </LinkButton>
+        </div>
+      </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Card className="flex min-h-[260px] flex-col p-6">
             <p className="text-[13px] font-medium text-ink-soft">Adicionadas na semana</p>
             <p className="numeric mt-1 text-[40px] leading-none font-bold text-ink">
@@ -152,12 +176,9 @@ export function Dashboard() {
           <Card className="p-6">
             <CardHeaderInline title="Seu acervo" subtitle="Resumo geral" />
             <dl className="mt-5 grid grid-cols-2 gap-3">
-              <MiniStat label="Álbuns" value={projects.length} />
+              <MiniStat label="Da loja" value={stats.fromStore} />
+              <MiniStat label="Minhas" value={photos.length - stats.fromStore} />
               <MiniStat label="Favoritas" value={stats.favorites} />
-              <MiniStat
-                label="Elementos"
-                value={BUILTIN_ELEMENTS.length + elements.length}
-              />
               <MiniStat label="Espaço" value={formatBytes(stats.totalBytes)} />
             </dl>
           </Card>
@@ -231,52 +252,5 @@ function MiniStat({ label, value }: { label: string; value: string | number }) {
       <dt className="text-[11px] font-medium text-ink-faint">{label}</dt>
       <dd className="numeric mt-1 text-xl font-bold text-ink">{value}</dd>
     </div>
-  )
-}
-
-function HeroCard({ photoCount }: { photoCount: number }) {
-  return (
-    <Card className="relative overflow-hidden border-0 bg-brand p-0">
-      <div className="absolute inset-0 opacity-25 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.5)_1px,transparent_0)] [background-size:24px_24px]" />
-      <div className="absolute -top-20 -right-16 size-64 rounded-full bg-white/10 blur-3xl" />
-
-      <div className="relative flex h-full flex-col justify-between p-7">
-        <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-semibold text-white">
-            <Icon.Sparkle className="size-3.5" />
-            Assistência inteligente
-          </span>
-          <h2 className="mt-4 text-2xl leading-tight font-bold text-white">
-            {photoCount === 0
-              ? 'Comece enviando suas fotos'
-              : 'Monte um álbum em poucos cliques'}
-          </h2>
-          <p className="mt-2 text-sm text-white/75">
-            {photoCount === 0
-              ? 'Cadastre sua biblioteca e a Photoon organiza tudo para você.'
-              : `Você já tem ${photoCount} ${photoCount === 1 ? 'foto pronta' : 'fotos prontas'} para virar álbum.`}
-          </p>
-        </div>
-
-        <div className="mt-8">
-          <div className="grid grid-cols-3 gap-2 rounded-2xl bg-white/12 p-2 backdrop-blur-sm">
-            <div className="col-span-2 aspect-4/3 rounded-xl bg-white/25" />
-            <div className="aspect-square rounded-xl bg-white/18" />
-            <div className="aspect-square rounded-xl bg-white/18" />
-            <div className="col-span-2 aspect-4/3 rounded-xl bg-white/25" />
-          </div>
-
-          <LinkButton
-            to={photoCount === 0 ? '/app/fotos' : '/app/albuns/novo'}
-            variant="white"
-            size="lg"
-            block
-            className="mt-5"
-          >
-            {photoCount === 0 ? 'Enviar minhas fotos' : 'Criar álbum agora'}
-          </LinkButton>
-        </div>
-      </div>
-    </Card>
   )
 }

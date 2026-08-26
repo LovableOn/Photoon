@@ -244,10 +244,13 @@ export function Badge({
 
 export function Avatar({
   name,
+  src,
   size = 36,
   className = '',
 }: {
   name: string
+  /** Retrato do cliente. Sem ele, caímos nas iniciais. */
+  src?: string | null
   size?: number
   className?: string
 }) {
@@ -257,6 +260,17 @@ export function Avatar({
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join('')
+
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={name}
+        className={`inline-block shrink-0 rounded-full object-cover ${className}`}
+        style={{ width: size, height: size }}
+      />
+    )
+  }
 
   return (
     <span

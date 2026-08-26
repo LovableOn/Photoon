@@ -13,6 +13,13 @@ import { processImage, type Orientation } from './images'
 import { useAuth } from './auth'
 import type { Spread } from './editorTypes'
 import { buildSpreads } from './layouts'
+import { computeSignature } from './similarity'
+import {
+  SEED_GALLERY,
+  SEED_GALLERY_NAME,
+  renderSeedPhoto,
+  type SeedSpec,
+} from './seedGallery'
 
 export interface Photo {
   id: string
@@ -26,6 +33,14 @@ export interface Photo {
   createdAt: number
   blob: Blob
   thumb: Blob
+  /** `loja` veio do lojista; `propria` foi enviada pelo próprio cliente. */
+  origin: 'loja' | 'propria'
+  /** Galeria de origem, quando a foto veio da loja. */
+  gallery: string | null
+  /** Momento da cobertura (cerimônia, festa...), quando a loja classificou. */
+  moment: string | null
+  /** Assinatura perceptual, usada na busca por semelhança. */
+  signature: number[]
 }
 
 export interface CustomElement {
@@ -94,12 +109,43 @@ interface StoreValue {
   }) => Promise<Project>
   updateProject: (id: string, patch: Partial<Project>) => Promise<void>
   deleteProject: (id: string) => Promise<void>
+
+  /** Quantas fotos da galeria da loja já foram preparadas, de quantas. */
+  seeding: { done: number; total: number } | null
 }
 
 const StoreContext = createContext<StoreValue | null>(null)
 
 const IMAGE_TYPES = /^image\/(jpeg|png|webp|avif|gif)$/
 const ELEMENT_TYPES = /^image\/(svg\+xml|png|webp)$/
+
+/** Monta uma foto da galeria da loja a partir da sua especificação. */
+async function buildSeedPhoto(spec: SeedSpec, owner: string): Promise<Photo> {
+  const blob = await renderSeedPhoto(spec)
+  const file = new File([blob], `${spec.name}.jpg`, { type: 'image/jpeg' })
+  const processed = await processImage(file)
+  const signature = await computeSignature(processed.thumb)
+
+  return {
+    id: uid('pho'),
+    owner,
+    name: spec.name,
+    size: file.size,
+    width: processed.width,
+    height: processed.height,
+    orientation: processed.orientation,
+    favorite: Boolean(spec.favorite),
+    // Espalha as datas pela semana da cobertura, para os gráficos e a
+    // ordenação por data terem o que mostrar.
+    createdAt: Date.now() - spec.seed * 60_000,
+    blob: processed.blob,
+    thumb: processed.thumb,
+    origin: 'loja',
+    gallery: SEED_GALLERY_NAME,
+    moment: spec.moment,
+    signature,
+  }
+}
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
@@ -111,6 +157,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [projects, setProjects] = useState<Project[]>([])
   const [thumbUrls, setThumbUrls] = useState<Record<string, string>>({})
   const [elementUrls, setElementUrls] = useState<Record<string, string>>({})
+  const [seeding, setSeeding] = useState<{ done: number; total: number } | null>(null)
 
   // Guarda todas as URLs criadas para revogá-las ao desmontar ou trocar de conta.
   const urlsRef = useRef<string[]>([])
@@ -186,6 +233,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setThumbUrls(nextThumbs)
       setElementUrls(nextElements)
       setIsLoading(false)
+
+      // Primeiro acesso: a loja libera a galeria contratada. Fica fora do
+      // `isLoading` de propósito — o painel já abre e as fotos entram na tela
+      // conforme ficam prontas, em vez de segurar tudo numa espera longa.
+      if (mine.length === 0) {
+        await seedStoreGallery(owner, cancelled)
+      }
+    }
+
+    /** Prepara a galeria da loja e entrega as fotos aos poucos. */
+    async function seedStoreGallery(ownerEmail: string, abortedAtStart: boolean) {
+      if (abortedAtStart) return
+      setSeeding({ done: 0, total: SEED_GALLERY.length })
+
+      for (const [index, spec] of SEED_GALLERY.entries()) {
+        if (cancelled) return
+        try {
+          const photo = await buildSeedPhoto(spec, ownerEmail)
+          if (cancelled) return
+
+          await put('photos', photo)
+          const url = URL.createObjectURL(photo.thumb)
+          urlsRef.current.push(url)
+
+          setThumbUrls((current) => ({ ...current, [photo.id]: url }))
+          setPhotos((current) => [photo, ...current])
+        } catch {
+          // uma foto que falhe não pode derrubar a galeria inteira
+        }
+        setSeeding({ done: index + 1, total: SEED_GALLERY.length })
+      }
+
+      if (!cancelled) setSeeding(null)
     }
 
     void load()
@@ -205,6 +285,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       for (const file of accepted) {
         try {
           const processed = await processImage(file)
+          const signature = await computeSignature(processed.thumb)
           created.push({
             id: uid('pho'),
             owner,
@@ -217,6 +298,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             createdAt: Date.now(),
             blob: processed.blob,
             thumb: processed.thumb,
+            origin: 'propria',
+            gallery: null,
+            moment: null,
+            signature,
           })
         } catch {
           failed += 1
@@ -444,6 +529,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       createProject,
       updateProject,
       deleteProject,
+      seeding,
     }),
     [
       isLoading,
@@ -462,6 +548,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       createProject,
       updateProject,
       deleteProject,
+      seeding,
     ],
   )
 

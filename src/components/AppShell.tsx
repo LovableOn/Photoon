@@ -6,17 +6,23 @@ import { Icon } from './icons'
 import { useAuth } from '../lib/auth'
 import { useStore } from '../lib/store'
 
+/**
+ * Menu do cliente.
+ *
+ * Cadastrar e editar elementos é trabalho do lojista, não de quem monta o
+ * álbum — por isso não há aba de Elementos aqui. O cliente usa os elementos
+ * dentro do editor, no painel próprio.
+ */
 const NAV = [
   { to: '/app', label: 'Início', end: true },
   { to: '/app/albuns', label: 'Álbuns', end: false },
   { to: '/app/fotos', label: 'Fotos', end: false },
-  { to: '/app/elementos', label: 'Elementos', end: false },
 ]
 
 const RAIL = [
   { to: '/app/albuns/novo', label: 'Novo álbum', icon: <Icon.Plus className="size-[18px]" /> },
   { to: '/app/fotos', label: 'Fotos', icon: <Icon.Photos className="size-[18px]" /> },
-  { to: '/app/elementos', label: 'Elementos', icon: <Icon.Elements className="size-[18px]" /> },
+  { to: '/app/albuns', label: 'Álbuns', icon: <Icon.Albums className="size-[18px]" /> },
   { to: '/app/ajuda', label: 'Ajuda', icon: <Icon.Help className="size-[18px]" /> },
   { to: '/app/conta', label: 'Minha conta', icon: <Icon.User className="size-[18px]" /> },
 ]
@@ -46,7 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-svh bg-canvas">
-      <header className="sticky top-0 z-30 bg-canvas/85 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-line bg-surface">
         <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-5">
             <Link
@@ -60,7 +66,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </span>
             </Link>
 
-            <nav className="scrollbar-thin flex items-center gap-1 overflow-x-auto rounded-full border border-line/70 bg-surface p-1 shadow-float">
+            <nav className="scrollbar-thin flex items-center gap-1 overflow-x-auto rounded-full bg-subtle p-1">
               {NAV.map((item) => (
                 <NavLink
                   key={item.to}
@@ -70,7 +76,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     `shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition ${
                       isActive
                         ? 'bg-ink text-white'
-                        : 'text-ink-soft hover:bg-subtle hover:text-ink'
+                        : 'text-ink-soft hover:bg-white hover:text-ink'
                     }`
                   }
                 >
@@ -81,7 +87,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            <span className="hidden items-center gap-2 rounded-full border border-line/70 bg-surface py-1.5 pr-4 pl-2 shadow-float xl:inline-flex">
+            <span className="hidden items-center gap-2 rounded-full bg-subtle py-1.5 pr-4 pl-2 xl:inline-flex">
               <span className="flex size-7 items-center justify-center rounded-full bg-primary-soft text-[11px] font-bold text-primary">
                 {photos.length}
               </span>
@@ -98,9 +104,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => setMenuOpen((open) => !open)}
-                className="flex items-center gap-2 rounded-full border border-line/70 bg-surface py-1 pr-3 pl-1 shadow-float transition hover:border-ink/20"
+                className="flex items-center gap-2 rounded-full border border-line bg-surface py-1 pr-3 pl-1 transition hover:border-ink/20"
               >
-                <Avatar name={user?.name ?? ''} size={30} />
+                <Avatar name={user?.name ?? ''} src={user?.avatar} size={30} />
                 <span className="hidden text-[13px] font-semibold text-ink sm:block">
                   {user?.name.split(' ')[0]}
                 </span>
