@@ -20,6 +20,21 @@ npm run lint     # oxlint
 npm run preview  # serve o build
 ```
 
+### Página única, para hospedar em qualquer lugar
+
+Onde não dá para servir uma pasta de assets nem reescrever rotas no servidor,
+gere um HTML com tudo embutido:
+
+```bash
+VITE_ROUTER=hash npm run build
+node scripts/bundle-single-file.mjs dist/photoon.html
+```
+
+`VITE_ROUTER=hash` troca o roteador para hash (`#/app/fotos`), que é o que
+sobrevive a um recarregamento sem suporte do servidor. O flag `--fragment` gera
+a mesma coisa sem `<html>`, `<head>` e `<body>`, para hosts que fornecem o
+invólucro.
+
 ## O que já funciona
 
 **Acesso**
@@ -59,6 +74,10 @@ Esta versão não tem back-end. Fotos e elementos (blobs inclusive) ficam no
 **IndexedDB** do navegador, e a sessão no `localStorage` — os dados são por
 dispositivo e por conta. Ao plugar uma API, o ponto de troca é `src/lib/db.ts`,
 consumido apenas por `src/lib/store.tsx`.
+
+Onde o navegador bloqueia armazenamento (janela anônima, iframe de terceiro), o
+app cai para um espelho em memória: continua funcionando na sessão atual e só
+perde os dados ao recarregar.
 
 ## Estrutura
 

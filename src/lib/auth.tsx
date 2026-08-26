@@ -44,8 +44,29 @@ function readUsers(): StoredUser[] {
   }
 }
 
+/**
+ * Alguns contextos bloqueiam o localStorage (janela anônima, iframe de
+ * terceiro). Aí a sessão só não sobrevive a um recarregamento — o app segue
+ * funcionando em vez de quebrar.
+ */
+function writeKey(key: string, value: string) {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    // armazenamento indisponível, a sessão vale só para esta aba
+  }
+}
+
+function removeKey(key: string) {
+  try {
+    localStorage.removeItem(key)
+  } catch {
+    // idem
+  }
+}
+
 function writeUsers(users: StoredUser[]) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users))
+  writeKey(USERS_KEY, JSON.stringify(users))
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -76,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           throw new Error('E-mail ou senha incorretos.')
         }
         const session: User = { name: found.name, email: found.email }
-        localStorage.setItem(SESSION_KEY, JSON.stringify(session))
+        writeKey(SESSION_KEY, JSON.stringify(session))
         setUser(session)
       },
       async register(name, email, password) {
@@ -92,11 +113,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const newUser: StoredUser = { name, email, password }
         writeUsers([...users, newUser])
         const session: User = { name, email }
-        localStorage.setItem(SESSION_KEY, JSON.stringify(session))
+        writeKey(SESSION_KEY, JSON.stringify(session))
         setUser(session)
       },
       logout() {
-        localStorage.removeItem(SESSION_KEY)
+        removeKey(SESSION_KEY)
         setUser(null)
       },
       async requestPasswordReset(_email) {

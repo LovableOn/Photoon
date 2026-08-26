@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider, useAuth } from './lib/auth'
 import { StoreProvider } from './lib/store'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -32,9 +32,16 @@ function RootRedirect() {
   return <Navigate to={user ? '/app' : '/login'} replace />
 }
 
+/**
+ * Em hospedagens de página única, sem reescrita de rotas no servidor, o
+ * roteamento por hash é o que sobrevive a um recarregamento em `/app/fotos`.
+ * Definido em tempo de build por `VITE_ROUTER=hash`.
+ */
+const Router = import.meta.env.VITE_ROUTER === 'hash' ? HashRouter : BrowserRouter
+
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <AuthProvider>
         <StoreProvider>
           <Routes>
@@ -114,7 +121,7 @@ function App() {
           </Routes>
         </StoreProvider>
       </AuthProvider>
-    </BrowserRouter>
+    </Router>
   )
 }
 
