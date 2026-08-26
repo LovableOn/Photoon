@@ -1,84 +1,52 @@
 import type { ReactNode } from 'react'
 import { Logo } from './Logo'
 
-const HIGHLIGHTS = [
-  'Monte álbuns de fotos em minutos',
-  'Modelos prontos para cada ocasião',
-  'Compartilhe e peça impressão sem complicação',
-]
-
 export function AuthLayout({
   children,
-  eyebrow,
   title,
   subtitle,
+  supportCard = true,
 }: {
   children: ReactNode
-  eyebrow: string
   title: string
   subtitle: string
+  supportCard?: boolean
 }) {
   return (
-    <div className="grid min-h-svh lg:grid-cols-2">
-      <div className="flex flex-col px-6 py-10 sm:px-12 lg:px-16 lg:py-14">
-        <Logo />
+    <div className="flex min-h-svh flex-col items-center bg-bg px-6 py-10">
+      <Logo />
 
-        <div className="flex flex-1 flex-col justify-center py-10">
-          <div className="mx-auto w-full max-w-sm">
-            <p className="text-sm font-semibold uppercase tracking-wide text-coral-600">
-              {eyebrow}
-            </p>
-            <h1 className="mt-2 font-display text-3xl font-medium text-ink">
-              {title}
-            </h1>
-            <p className="mt-2 text-ink-soft">{subtitle}</p>
+      <div className="flex w-full flex-1 flex-col items-center justify-center py-8">
+        <div className="w-full max-w-[440px]">
+          <div className="rounded-[14px] border border-border bg-surface p-8 shadow-card">
+            <h1 className="text-2xl font-bold text-ink">{title}</h1>
+            <p className="mt-1.5 text-sm text-ink-soft">{subtitle}</p>
 
-            <div className="mt-8">{children}</div>
+            <div className="mt-6">{children}</div>
           </div>
+
+          {supportCard && (
+            <div className="mt-4 rounded-[14px] border border-border bg-surface px-5 py-3.5 text-center text-sm text-ink-soft shadow-card">
+              Problemas para acessar?{' '}
+              <a href="#" className="font-semibold text-primary hover:underline">
+                Fale com a empresa
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="relative hidden overflow-hidden bg-ink lg:block">
-        <div className="absolute inset-0 bg-gradient-to-br from-plum-600 via-ink to-coral-700" />
-        <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.4)_1px,transparent_0)] [background-size:28px_28px]" />
-
-        <div className="relative flex h-full flex-col justify-between p-14 text-cream">
-          <div />
-          <div>
-            <p className="font-display text-3xl leading-snug font-medium">
-              Suas memórias merecem
-              <br />
-              um álbum tão bonito quanto elas.
-            </p>
-            <ul className="mt-8 space-y-3">
-              {HIGHLIGHTS.map((item) => (
-                <li key={item} className="flex items-center gap-3 text-cream/90">
-                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-cream/15">
-                    <svg
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      className="size-3.5"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M4 10.5 8 14l8-8"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <p className="text-sm text-cream/60">
-            © {new Date().getFullYear()} Photoon. Todos os direitos reservados.
-          </p>
+      <footer className="flex flex-col items-center gap-1 pt-4 text-center text-xs text-ink-faint">
+        <div className="flex items-center gap-4">
+          <a href="#" className="hover:text-ink-soft">
+            Política de privacidade
+          </a>
+          <a href="#" className="hover:text-ink-soft">
+            Contato
+          </a>
         </div>
-      </div>
+        <p>Tecnologia Photoon</p>
+      </footer>
     </div>
   )
 }

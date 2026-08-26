@@ -3,39 +3,39 @@ import { Logo, LogoMark } from '../components/Logo'
 
 const FEATURES = [
   {
-    title: 'Modelos prontos',
+    title: 'Assistência inteligente',
     description:
-      'Escolha entre dezenas de modelos para casamento, viagem, bebê e muito mais.',
+      'Selecione as fotos e receba um álbum completo, diagramado automaticamente, em poucos cliques.',
   },
   {
-    title: 'Edição simples',
+    title: 'Layouts inteligentes',
     description:
-      'Arraste suas fotos, ajuste o layout e pronto — sem curva de aprendizado.',
+      'Prefere montar você mesmo? Use layouts, textos, fundos e elementos modernos com total controle.',
   },
   {
-    title: 'Impressão de qualidade',
+    title: 'Revisão guiada',
     description:
-      'Receba seu álbum impresso em casa com papel e acabamento premium.',
+      'Antes de finalizar, a revisão aponta o que falta: fotos com baixa qualidade, páginas vazias e rostos cortados.',
   },
 ]
 
 export function Landing() {
   return (
-    <div className="min-h-svh bg-cream">
+    <div className="min-h-svh bg-bg">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Logo />
         <nav className="flex items-center gap-3">
           <Link
             to="/login"
-            className="rounded-xl px-4 py-2 text-sm font-semibold text-ink hover:bg-black/5"
+            className="rounded-xl px-4 py-2 text-sm font-semibold text-ink hover:bg-surface"
           >
             Entrar
           </Link>
           <Link
             to="/cadastro"
-            className="rounded-xl bg-coral-600 px-4 py-2 text-sm font-semibold text-white shadow-soft hover:bg-coral-700"
+            className="rounded-xl bg-gradient-brand px-4 py-2 text-sm font-semibold text-white shadow-card"
           >
-            Criar conta grátis
+            Criar conta
           </Link>
         </nav>
       </header>
@@ -43,27 +43,27 @@ export function Landing() {
       <main>
         <section className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-24">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-coral-50 px-3 py-1 text-sm font-medium text-coral-700">
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-sm font-medium text-primary">
               <LogoMark className="size-4" />
-              Novo na Photoon
+              Área do cliente Photoon
             </span>
-            <h1 className="mt-5 font-display text-4xl font-medium leading-tight text-ink sm:text-5xl">
-              Transforme suas fotos em álbuns inesquecíveis
+            <h1 className="mt-5 text-4xl font-bold leading-tight text-ink sm:text-5xl">
+              Monte álbuns de fotos com facilidade
             </h1>
             <p className="mt-4 max-w-md text-lg text-ink-soft">
-              Crie, personalize e compartilhe álbuns de fotos lindos em
-              minutos. Sem experiência em design, sem complicação.
+              Selecione as fotos liberadas para você, crie com assistência de
+              IA ou monte manualmente com layouts inteligentes.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 to="/cadastro"
-                className="rounded-xl bg-coral-600 px-6 py-3 font-semibold text-white shadow-soft hover:bg-coral-700"
+                className="rounded-xl bg-gradient-brand px-6 py-3 font-semibold text-white shadow-card"
               >
-                Começar agora
+                Criar conta
               </Link>
               <Link
                 to="/login"
-                className="rounded-xl px-6 py-3 font-semibold text-ink hover:bg-black/5"
+                className="rounded-xl border border-border bg-surface px-6 py-3 font-semibold text-ink"
               >
                 Já tenho uma conta
               </Link>
@@ -71,28 +71,28 @@ export function Landing() {
           </div>
 
           <div className="relative">
-            <div className="aspect-4/3 rounded-3xl bg-gradient-to-br from-plum-500 via-coral-500 to-coral-400 p-2 shadow-soft">
-              <div className="grid h-full grid-cols-3 grid-rows-2 gap-2">
+            <div className="rounded-[14px] bg-gradient-brand p-2 shadow-card">
+              <div className="grid aspect-4/3 grid-cols-3 grid-rows-2 gap-2">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl bg-white/25 backdrop-blur-sm"
-                  />
+                  <div key={i} className="rounded-lg bg-white/20" />
                 ))}
               </div>
             </div>
           </div>
         </section>
 
-        <section className="border-t border-black/5 bg-white">
+        <section className="border-t border-border bg-surface">
           <div className="mx-auto max-w-6xl px-6 py-16">
-            <h2 className="text-center font-display text-3xl font-medium text-ink">
-              Tudo que você precisa para o álbum perfeito
+            <h2 className="text-center text-3xl font-bold text-ink">
+              Feito para quem nunca diagramou um álbum
             </h2>
             <div className="mt-10 grid gap-8 sm:grid-cols-3">
               {FEATURES.map((feature) => (
-                <div key={feature.title}>
-                  <div className="mb-3 flex size-10 items-center justify-center rounded-xl bg-coral-50 text-coral-600 font-semibold">
+                <div
+                  key={feature.title}
+                  className="rounded-[14px] border border-border p-5"
+                >
+                  <div className="mb-3 flex size-10 items-center justify-center rounded-xl bg-gradient-brand text-sm font-bold text-white">
                     {feature.title.charAt(0)}
                   </div>
                   <h3 className="font-semibold text-ink">{feature.title}</h3>
@@ -106,7 +106,7 @@ export function Landing() {
         </section>
       </main>
 
-      <footer className="mx-auto max-w-6xl px-6 py-10 text-sm text-ink-soft">
+      <footer className="mx-auto max-w-6xl px-6 py-10 text-sm text-ink-faint">
         © {new Date().getFullYear()} Photoon. Todos os direitos reservados.
       </footer>
     </div>

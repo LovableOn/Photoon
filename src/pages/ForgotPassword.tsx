@@ -25,23 +25,24 @@ export function ForgotPassword() {
   if (sent) {
     return (
       <AuthLayout
-        eyebrow="Verifique seu e-mail"
-        title="Enviamos um link de recuperação"
-        subtitle={`Se existir uma conta para ${email}, você receberá instruções para redefinir sua senha em instantes.`}
+        title="Verifique seu e-mail"
+        subtitle="Se este e-mail estiver cadastrado, você receberá um link para criar uma nova senha em instantes."
       >
-        <div className="space-y-4">
-          <Button
-            variant="ghost"
-            className="border border-black/10"
-            onClick={() => setSent(false)}
-          >
+        <div className="space-y-3">
+          <Button variant="secondary" onClick={() => setSent(false)}>
             Usar outro e-mail
           </Button>
           <Link
             to={`/redefinir-senha?email=${encodeURIComponent(email)}`}
-            className="block text-center text-sm font-semibold text-coral-600 hover:text-coral-700"
+            className="block text-center text-sm font-semibold text-primary hover:underline"
           >
             Já tenho um código, redefinir senha
+          </Link>
+          <Link
+            to="/login"
+            className="block text-center text-sm text-ink-soft hover:text-ink"
+          >
+            Voltar para entrar
           </Link>
         </div>
       </AuthLayout>
@@ -50,7 +51,6 @@ export function ForgotPassword() {
 
   return (
     <AuthLayout
-      eyebrow="Recuperar acesso"
       title="Esqueceu sua senha?"
       subtitle="Informe seu e-mail e enviaremos um link para você criar uma nova senha."
     >
@@ -73,11 +73,8 @@ export function ForgotPassword() {
 
       <p className="mt-6 text-center text-sm text-ink-soft">
         Lembrou sua senha?{' '}
-        <Link
-          to="/login"
-          className="font-semibold text-coral-600 hover:text-coral-700"
-        >
-          Voltar para o login
+        <Link to="/login" className="font-semibold text-primary hover:underline">
+          Voltar para entrar
         </Link>
       </p>
     </AuthLayout>

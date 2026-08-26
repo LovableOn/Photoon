@@ -47,7 +47,9 @@ export function Register() {
       navigate('/app', { replace: true })
     } catch (err) {
       setFormError(
-        err instanceof Error ? err.message : 'Não foi possível criar sua conta.',
+        err instanceof Error
+          ? err.message
+          : 'Não foi possível criar sua conta agora. Tente novamente em instantes.',
       )
     } finally {
       setLoading(false)
@@ -56,13 +58,16 @@ export function Register() {
 
   return (
     <AuthLayout
-      eyebrow="Comece agora"
-      title="Crie sua conta"
-      subtitle="Leva menos de um minuto para começar a montar seus álbuns."
+      title="Criar sua conta"
+      subtitle="Preencha os dados abaixo para acessar seus projetos."
+      supportCard={false}
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         {formError && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          <div
+            role="alert"
+            className="rounded-xl border border-danger/20 bg-danger-bg px-4 py-2.5 text-sm text-danger"
+          >
             {formError}
           </div>
         )}
@@ -112,18 +117,15 @@ export function Register() {
           Criar conta
         </Button>
 
-        <p className="text-center text-xs text-ink-soft">
+        <p className="text-center text-xs text-ink-faint">
           Ao continuar, você concorda com os Termos de Uso e a Política de
-          Privacidade da Photoon.
+          Privacidade.
         </p>
       </form>
 
       <p className="mt-6 text-center text-sm text-ink-soft">
         Já tem uma conta?{' '}
-        <Link
-          to="/login"
-          className="font-semibold text-coral-600 hover:text-coral-700"
-        >
+        <Link to="/login" className="font-semibold text-primary hover:underline">
           Entrar
         </Link>
       </p>

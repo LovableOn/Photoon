@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
 import { FormField, PasswordField } from '../components/FormField'
+import { Checkbox } from '../components/Checkbox'
 import { Button } from '../components/Button'
 import { useAuth } from '../lib/auth'
 
@@ -12,6 +13,7 @@ export function Login() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [keepConnected, setKeepConnected] = useState(true)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -24,8 +26,8 @@ export function Login() {
     try {
       await login(email, password)
       navigate(from, { replace: true })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Não foi possível entrar.')
+    } catch {
+      setError('E-mail ou senha incorretos. Confira os dados e tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -33,13 +35,15 @@ export function Login() {
 
   return (
     <AuthLayout
-      eyebrow="Bem-vindo de volta"
-      title="Entre na sua conta"
-      subtitle="Acesse a Photoon para continuar criando seus álbuns."
+      title="Acesse seus projetos"
+      subtitle="Entre com os dados fornecidos pela sua empresa."
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          <div
+            role="alert"
+            className="rounded-xl border border-danger/20 bg-danger-bg px-4 py-2.5 text-sm text-danger"
+          >
             {error}
           </div>
         )}
@@ -55,24 +59,29 @@ export function Login() {
           required
         />
 
-        <div>
-          <PasswordField
-            id="password"
-            label="Senha"
-            autoComplete="current-password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+        <PasswordField
+          id="password"
+          label="Senha"
+          autoComplete="current-password"
+          placeholder="Sua senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <div className="flex items-center justify-between">
+          <Checkbox
+            id="keepConnected"
+            label="Manter conectado neste dispositivo"
+            checked={keepConnected}
+            onChange={(e) => setKeepConnected(e.target.checked)}
           />
-          <div className="mt-2 text-right">
-            <Link
-              to="/esqueci-senha"
-              className="text-sm font-medium text-coral-600 hover:text-coral-700"
-            >
-              Esqueceu sua senha?
-            </Link>
-          </div>
+          <Link
+            to="/esqueci-senha"
+            className="shrink-0 text-sm font-semibold text-primary hover:underline"
+          >
+            Esqueci minha senha
+          </Link>
         </div>
 
         <Button type="submit" loading={loading}>
@@ -82,11 +91,8 @@ export function Login() {
 
       <p className="mt-6 text-center text-sm text-ink-soft">
         Ainda não tem uma conta?{' '}
-        <Link
-          to="/cadastro"
-          className="font-semibold text-coral-600 hover:text-coral-700"
-        >
-          Cadastre-se grátis
+        <Link to="/cadastro" className="font-semibold text-primary hover:underline">
+          Cadastre-se
         </Link>
       </p>
     </AuthLayout>

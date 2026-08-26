@@ -9,8 +9,8 @@ export function LogoMark({ className = 'size-9' }: { className?: string }) {
       aria-hidden="true"
     >
       <rect width="40" height="40" rx="12" fill="url(#photoon-gradient)" />
-      <circle cx="20" cy="20" r="8" fill="var(--color-cream)" />
-      <circle cx="20" cy="20" r="3.5" fill="var(--color-coral-600)" />
+      <circle cx="20" cy="20" r="8" fill="white" fillOpacity="0.95" />
+      <circle cx="20" cy="20" r="3.5" fill="var(--color-primary)" />
       <defs>
         <linearGradient
           id="photoon-gradient"
@@ -20,8 +20,8 @@ export function LogoMark({ className = 'size-9' }: { className?: string }) {
           y2="40"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="var(--color-coral-500)" />
-          <stop offset="1" stopColor="var(--color-plum-500)" />
+          <stop stopColor="var(--color-primary)" />
+          <stop offset="1" stopColor="var(--color-secondary)" />
         </linearGradient>
       </defs>
     </svg>
@@ -41,7 +41,7 @@ export function Logo({
       className={`inline-flex items-center gap-2.5 ${className ?? ''}`}
     >
       <LogoMark />
-      <span className="font-display text-xl font-medium tracking-tight text-ink">
+      <span className="text-xl font-bold tracking-tight text-ink">
         Photoon
       </span>
     </Link>

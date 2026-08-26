@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
 import { FormField, PasswordField } from '../components/FormField'
 import { Button } from '../components/Button'
@@ -7,7 +7,6 @@ import { useAuth } from '../lib/auth'
 
 export function ResetPassword() {
   const { resetPassword } = useAuth()
-  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
   const [email, setEmail] = useState(searchParams.get('email') ?? '')
@@ -34,10 +33,11 @@ export function ResetPassword() {
     try {
       await resetPassword(email, password)
       setDone(true)
-      setTimeout(() => navigate('/login', { replace: true }), 1800)
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Não foi possível redefinir a senha.',
+        err instanceof Error
+          ? err.message
+          : 'Não foi possível redefinir a senha agora. Tente novamente.',
       )
     } finally {
       setLoading(false)
@@ -47,15 +47,11 @@ export function ResetPassword() {
   if (done) {
     return (
       <AuthLayout
-        eyebrow="Tudo pronto"
-        title="Senha redefinida!"
-        subtitle="Você já pode entrar com sua nova senha. Redirecionando para o login..."
+        title="Senha redefinida"
+        subtitle="Sua senha foi alterada com sucesso. Você já pode entrar com a nova senha."
       >
-        <Link
-          to="/login"
-          className="block text-center text-sm font-semibold text-coral-600 hover:text-coral-700"
-        >
-          Ir para o login agora
+        <Link to="/login">
+          <Button>Voltar para entrar</Button>
         </Link>
       </AuthLayout>
     )
@@ -63,13 +59,15 @@ export function ResetPassword() {
 
   return (
     <AuthLayout
-      eyebrow="Criar nova senha"
-      title="Redefinir senha"
-      subtitle="Escolha uma nova senha para acessar sua conta Photoon."
+      title="Criar nova senha"
+      subtitle="Escolha uma nova senha para acessar sua conta."
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          <div
+            role="alert"
+            className="rounded-xl border border-danger/20 bg-danger-bg px-4 py-2.5 text-sm text-danger"
+          >
             {error}
           </div>
         )}
@@ -111,11 +109,8 @@ export function ResetPassword() {
       </form>
 
       <p className="mt-6 text-center text-sm text-ink-soft">
-        <Link
-          to="/login"
-          className="font-semibold text-coral-600 hover:text-coral-700"
-        >
-          Voltar para o login
+        <Link to="/login" className="font-semibold text-primary hover:underline">
+          Voltar para entrar
         </Link>
       </p>
     </AuthLayout>

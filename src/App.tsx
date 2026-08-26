@@ -8,6 +8,7 @@ import { ForgotPassword } from './pages/ForgotPassword'
 import { ResetPassword } from './pages/ResetPassword'
 import { Home } from './pages/Home'
 import { Account } from './pages/Account'
+import { Help } from './pages/Help'
 import { NotFound } from './pages/NotFound'
 
 function App() {
@@ -34,6 +35,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Account />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/ajuda"
+            element={
+              <ProtectedRoute>
+                <Help />
               </ProtectedRoute>
             }
           />

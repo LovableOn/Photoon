@@ -6,6 +6,7 @@ import { useAuth } from '../lib/auth'
 const NAV_ITEMS = [
   { to: '/app', label: 'Início', end: true },
   { to: '/app/conta', label: 'Minha conta', end: false },
+  { to: '/app/ajuda', label: 'Ajuda', end: false },
 ]
 
 function initials(name: string) {
@@ -28,9 +29,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-svh bg-cream-100">
-      <header className="sticky top-0 z-10 border-b border-black/5 bg-cream-100/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <div className="min-h-svh bg-bg">
+      <header className="sticky top-0 z-10 h-[72px] border-b border-border bg-surface">
+        <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-8">
             <Logo to="/app" />
             <nav className="hidden items-center gap-1 sm:flex">
@@ -42,8 +43,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                   className={({ isActive }) =>
                     `rounded-lg px-3 py-2 text-sm font-medium transition ${
                       isActive
-                        ? 'bg-ink text-white'
-                        : 'text-ink-soft hover:bg-black/5 hover:text-ink'
+                        ? 'bg-bg text-primary'
+                        : 'text-ink-soft hover:bg-bg hover:text-ink'
                     }`
                   }
                 >
@@ -57,9 +58,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="flex items-center gap-2 rounded-full border border-black/10 bg-white py-1 pl-1 pr-3 text-sm font-medium text-ink hover:border-black/20"
+              className="flex items-center gap-2 rounded-full border border-border bg-surface py-1 pl-1 pr-3 text-sm font-medium text-ink hover:border-ink-faint"
             >
-              <span className="flex size-7 items-center justify-center rounded-full bg-coral-100 text-xs font-semibold text-coral-700">
+              <span className="flex size-7 items-center justify-center rounded-full bg-gradient-brand text-xs font-semibold text-white">
                 {user ? initials(user.name) : ''}
               </span>
               {user?.name.split(' ')[0]}
@@ -67,20 +68,27 @@ export function AppShell({ children }: { children: ReactNode }) {
 
             {menuOpen && (
               <div
-                className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-black/10 bg-white py-1 shadow-soft"
+                className="absolute right-0 mt-2 w-48 overflow-hidden rounded-[14px] border border-border bg-surface py-1 shadow-card"
                 onMouseLeave={() => setMenuOpen(false)}
               >
                 <NavLink
                   to="/app/conta"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-ink hover:bg-black/5"
+                  className="block px-4 py-2 text-sm text-ink hover:bg-bg"
                 >
                   Minha conta
+                </NavLink>
+                <NavLink
+                  to="/app/ajuda"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2 text-sm text-ink hover:bg-bg"
+                >
+                  Ajuda
                 </NavLink>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                  className="block w-full px-4 py-2 text-left text-sm text-danger hover:bg-danger-bg"
                 >
                   Sair
                 </button>
