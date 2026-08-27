@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { LogoMark } from './Logo'
+import { SideRail } from './SideRail'
 import { Avatar, IconButton, LinkIconButton } from './ui'
 import { Icon } from './icons'
 import { useAuth } from '../lib/auth'
@@ -17,14 +18,6 @@ const NAV = [
   { to: '/app', label: 'Início', end: true },
   { to: '/app/albuns', label: 'Álbuns', end: false },
   { to: '/app/fotos', label: 'Fotos', end: false },
-]
-
-const RAIL = [
-  { to: '/app/albuns/novo', label: 'Novo álbum', icon: <Icon.Plus className="size-[18px]" /> },
-  { to: '/app/fotos', label: 'Fotos', icon: <Icon.Photos className="size-[18px]" /> },
-  { to: '/app/albuns', label: 'Álbuns', icon: <Icon.Albums className="size-[18px]" /> },
-  { to: '/app/ajuda', label: 'Ajuda', icon: <Icon.Help className="size-[18px]" /> },
-  { to: '/app/conta', label: 'Minha conta', icon: <Icon.User className="size-[18px]" /> },
 ]
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -151,36 +144,52 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      {/* rail flutuante de ações rápidas */}
-      <aside className="fixed top-1/2 left-4 z-20 hidden -translate-y-1/2 lg:block">
-        <div className="flex flex-col items-center gap-1 rounded-full border border-line/70 bg-surface p-1.5 shadow-float">
-          {RAIL.map((item, index) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end
-              title={item.label}
-              aria-label={item.label}
-              className={({ isActive }) =>
-                `flex size-10 items-center justify-center rounded-full transition ${
-                  index === 0
-                    ? 'bg-brand text-white shadow-float hover:brightness-108'
-                    : isActive
-                      ? 'bg-ink text-white'
-                      : 'text-ink-faint hover:bg-subtle hover:text-ink'
-                }`
-              }
-            >
-              {item.icon}
-            </NavLink>
-          ))}
-        </div>
-      </aside>
+      <SideRail />
 
-      <main className="mx-auto max-w-[1440px] px-4 pb-16 sm:px-6 lg:pl-24">
+      <main className="mx-auto max-w-[1440px] px-4 pb-12 sm:px-6 lg:pl-28">
         {children}
       </main>
+
+      <StoreFooter store={user?.store ?? null} />
     </div>
+  )
+}
+
+/**
+ * Rodapé da loja.
+ *
+ * O cliente está dentro do ambiente do lojista, então quem assina o rodapé é
+ * a loja — o contato dela é o que resolve a dúvida dele. A Photoon aparece
+ * discreta, como a tecnologia por trás.
+ */
+function StoreFooter({ store }: { store: string | null }) {
+  const nome = store ?? 'Sua loja'
+
+  return (
+    <footer className="mt-4 border-t border-line bg-surface">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:pl-28">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <span className="text-[13px] font-semibold text-ink">{nome}</span>
+          <a
+            href="mailto:contato@exemplo.com.br"
+            className="text-[13px] text-ink-soft transition hover:text-primary"
+          >
+            contato@exemplo.com.br
+          </a>
+          <a
+            href="tel:+5511988442210"
+            className="text-[13px] text-ink-soft transition hover:text-primary"
+          >
+            (11) 98844-2210
+          </a>
+          <a href="#" className="text-[13px] text-ink-soft transition hover:text-primary">
+            Política de privacidade
+          </a>
+        </div>
+
+        <p className="text-[12px] text-ink-faint">Tecnologia Photoon</p>
+      </div>
+    </footer>
   )
 }
 

@@ -458,4 +458,276 @@ export const BUILTIN_ELEMENTS: BuiltinElement[] = [
     tags: ['aliança', 'casamento'],
     svg: `<circle cx="38" cy="58" r="24" ${T} /><circle cx="64" cy="58" r="24" ${T} opacity="0.6" /><path d="M30 30h16l-8 10Z" ${T} />`,
   },
+
+  /* ----------------------------------------------- Corações (segunda leva) */
+  {
+    id: 'coracao-alado',
+    name: 'Coração com asas',
+    category: 'Corações',
+    tags: ['coração', 'asas', 'anjo'],
+    svg: `<g transform="translate(0 4) scale(0.72)"><g transform="translate(19 6)"><path d="${HEART_D}" ${F} /></g></g>
+      <g ${TF}>
+        <path d="M32 46c-10-8-20-10-26-6 5 3 8 8 9 13 6-2 12-4 17-7Z"/>
+        <path d="M68 46c10-8 20-10 26-6-5 3-8 8-9 13-6-2-12-4-17-7Z"/>
+      </g>`,
+  },
+  {
+    id: 'coracao-flecha',
+    name: 'Coração com flecha',
+    category: 'Corações',
+    tags: ['coração', 'flecha', 'cupido'],
+    svg: `<path d="${HEART_D}" ${T} /><path d="M6 62 94 34" ${T} /><path d="M84 26l12 8-10 10" ${T} /><path d="M18 66l-12-4 2-8" ${T} />`,
+  },
+  {
+    id: 'coracoes-tres',
+    name: 'Três corações',
+    category: 'Corações',
+    tags: ['coração', 'trio'],
+    svg: `<g transform="translate(4 -6) scale(0.5)"><path d="${HEART_D}" ${F} /></g>
+      <g transform="translate(46 -14) scale(0.62)"><path d="${HEART_D}" ${F} /></g>
+      <g transform="translate(24 30) scale(0.44)" opacity="0.6"><path d="${HEART_D}" ${F} /></g>`,
+  },
+  {
+    id: 'coracao-mao',
+    name: 'Coração de mãos',
+    category: 'Corações',
+    tags: ['coração', 'mãos', 'família'],
+    svg: `<path d="${HEART_D}" ${T} /><path d="M50 32v38M32 46c6 4 12 6 18 6s12-2 18-6" ${TF} opacity="0.6" />`,
+  },
+
+  /* ----------------------------------------------- Molduras (segunda leva) */
+  {
+    id: 'moldura-dupla',
+    name: 'Moldura dupla',
+    category: 'Molduras',
+    tags: ['moldura', 'retângulo', 'clássica'],
+    svg: `<rect x="10" y="10" width="80" height="80" rx="4" ${T} /><rect x="18" y="18" width="64" height="64" rx="3" ${TF} opacity="0.55" />`,
+  },
+  {
+    id: 'moldura-laco',
+    name: 'Moldura com laço',
+    category: 'Molduras',
+    tags: ['moldura', 'laço', 'presente'],
+    svg: `<rect x="14" y="30" width="72" height="58" rx="6" ${T} />
+      <g ${T}>
+        <path d="M50 30c-6-9-15-13-20-9s-1 13 7 14c5 1 10-1 13-5Z"/>
+        <path d="M50 30c6-9 15-13 20-9s1 13-7 14c-5 1-10-1-13-5Z"/>
+      </g>`,
+  },
+  {
+    id: 'moldura-cordao',
+    name: 'Moldura cordão',
+    category: 'Molduras',
+    tags: ['moldura', 'cordão', 'pontos'],
+    svg: `<circle cx="50" cy="50" r="34" ${T} stroke-dasharray="0.5 8" stroke-width="5" />`,
+  },
+  {
+    id: 'moldura-flores',
+    name: 'Moldura florida',
+    category: 'Molduras',
+    tags: ['moldura', 'flores', 'romântica'],
+    svg: `<circle cx="50" cy="50" r="30" ${T} />
+      <g ${F} opacity="0.85">
+        ${[0, 45, 90, 135, 180, 225, 270, 315]
+          .map((a) => {
+            const rad = (a * Math.PI) / 180
+            const x = (50 + 30 * Math.cos(rad)).toFixed(1)
+            const y = (50 + 30 * Math.sin(rad)).toFixed(1)
+            return `<circle cx="${x}" cy="${y}" r="4.5"/>`
+          })
+          .join('')}
+      </g>`,
+  },
+
+  /* ---------------------------------------------- Arabescos (segunda leva) */
+  {
+    id: 'arabesco-coroa',
+    name: 'Coroa de arabesco',
+    category: 'Arabescos',
+    tags: ['arabesco', 'coroa', 'ornamento'],
+    svg: `<g ${T}>
+      <path d="M16 66c0-18 15-32 34-32s34 14 34 32"/>
+      <path d="M16 66c-6 0-10-5-10-11s5-10 10-8"/>
+      <path d="M84 66c6 0 10-5 10-11s-5-10-10-8"/>
+      <path d="M50 34V18"/><circle cx="50" cy="14" r="4"/>
+    </g>`,
+  },
+  {
+    id: 'arabesco-simetrico',
+    name: 'Arabesco simétrico',
+    category: 'Arabescos',
+    tags: ['arabesco', 'divisor', 'simétrico'],
+    svg: `<g ${T}>
+      <path d="M50 50c-8-10-20-12-28-6-6 5-4 14 4 15 6 1 10-3 10-8"/>
+      <path d="M50 50c8-10 20-12 28-6 6 5 4 14-4 15-6 1-10-3-10-8"/>
+      <path d="M50 50c-8 10-20 12-28 6-6-5-4-14 4-15 6-1 10 3 10 8"/>
+      <path d="M50 50c8 10 20 12 28 6 6-5 4-14-4-15-6-1-10 3-10 8"/>
+    </g>`,
+  },
+  {
+    id: 'renda',
+    name: 'Renda',
+    category: 'Arabescos',
+    tags: ['renda', 'delicado', 'barra'],
+    svg: `<g ${TF}>
+      <path d="M6 40h88"/>
+      ${[16, 33, 50, 67, 84]
+        .map((x) => `<path d="M${x} 40a9 9 0 0 0 18 0" transform="translate(-9 0)"/>`)
+        .join('')}
+      <path d="M6 40h88" transform="translate(0 22)" opacity="0.5" stroke-dasharray="2 6"/>
+    </g>`,
+  },
+
+  /* ------------------------------------------------ Florais (segunda leva) */
+  {
+    id: 'rosa',
+    name: 'Rosa',
+    category: 'Florais',
+    tags: ['rosa', 'flor', 'casamento'],
+    svg: `<g ${T}>
+      <circle cx="50" cy="42" r="26"/>
+      <path d="M50 68c-8 0-14-6-14-14s6-12 14-12 14 5 14 12"/>
+      <path d="M50 56c-4 0-7-3-7-7s3-6 7-6"/>
+      <path d="M50 68v22M50 78c-9 0-14-5-15-13 9 0 15 5 15 13Z"/>
+    </g>`,
+  },
+  {
+    id: 'coroa-flores',
+    name: 'Coroa de flores',
+    category: 'Florais',
+    tags: ['coroa', 'flores', 'guirlanda'],
+    svg: `<circle cx="50" cy="50" r="30" ${TF} opacity="0.6" />
+      <g ${F}>
+        ${[10, 70, 130, 190, 250, 310]
+          .map((a) => {
+            const rad = (a * Math.PI) / 180
+            const x = (50 + 30 * Math.cos(rad)).toFixed(1)
+            const y = (50 + 30 * Math.sin(rad)).toFixed(1)
+            return `<g transform="translate(${x} ${y}) scale(0.34)">${[0, 72, 144, 216, 288]
+              .map((p) => `<ellipse cx="0" cy="-14" rx="7" ry="13" transform="rotate(${p})"/>`)
+              .join('')}</g>`
+          })
+          .join('')}
+      </g>`,
+  },
+  {
+    id: 'folha-dupla',
+    name: 'Folhas cruzadas',
+    category: 'Florais',
+    tags: ['folha', 'verde', 'natural'],
+    svg: `<g ${F} opacity="0.9">
+      <path d="M50 82C28 76 18 58 22 34c22 6 32 24 28 48Z"/>
+      <path d="M50 82c22-6 32-24 28-48-22 6-32 24-28 48Z" opacity="0.6"/>
+    </g><path d="M50 90V52" ${TF} />`,
+  },
+
+  /* -------------------------------------------------- Fitas (segunda leva) */
+  {
+    id: 'faixa-curva',
+    name: 'Faixa curva',
+    category: 'Fitas',
+    tags: ['faixa', 'fita', 'curva'],
+    svg: `<path d="M8 42c14-10 30-14 42-14s28 4 42 14v20c-14-10-30-14-42-14s-28 4-42 14Z" ${T} />`,
+  },
+  {
+    id: 'pendao',
+    name: 'Bandeirinhas',
+    category: 'Fitas',
+    tags: ['bandeirinha', 'festa', 'varal'],
+    svg: `<path d="M4 26c22 20 70 20 92 0" ${TF} />
+      <g ${F} opacity="0.9">
+        <path d="M20 36l12 2-4 18Z"/><path d="M40 42l12 1-5 18Z" opacity="0.75"/>
+        <path d="M60 42l12-1-8 18Z"/><path d="M78 36l12-3-10 17Z" opacity="0.75"/>
+      </g>`,
+  },
+  {
+    id: 'selo-fita',
+    name: 'Fita com selo',
+    category: 'Fitas',
+    tags: ['fita', 'selo', 'premiado'],
+    svg: `<path d="M28 8h44v58L50 52 28 66Z" ${T} /><circle cx="50" cy="30" r="12" ${TF} opacity="0.6" />`,
+  },
+
+  /* -------------------------------------------------- Selos (segunda leva) */
+  {
+    id: 'selo-losango',
+    name: 'Selo losango',
+    category: 'Selos',
+    tags: ['selo', 'losango'],
+    svg: `<path d="M50 8 92 50 50 92 8 50Z" ${T} stroke-dasharray="6 5" /><path d="M50 26 74 50 50 74 26 50Z" ${TF} opacity="0.6" />`,
+  },
+  {
+    id: 'raios',
+    name: 'Explosão',
+    category: 'Selos',
+    tags: ['raios', 'destaque', 'novo'],
+    svg: `<g ${T}>${Array.from({ length: 12 }, (_, index) => {
+      const a = (index * 30 * Math.PI) / 180
+      const x1 = (50 + 20 * Math.cos(a)).toFixed(1)
+      const y1 = (50 + 20 * Math.sin(a)).toFixed(1)
+      const x2 = (50 + 40 * Math.cos(a)).toFixed(1)
+      const y2 = (50 + 40 * Math.sin(a)).toFixed(1)
+      return `<path d="M${x1} ${y1}L${x2} ${y2}"/>`
+    }).join('')}</g><circle cx="50" cy="50" r="14" ${T} />`,
+  },
+  {
+    id: 'estrela-cheia',
+    name: 'Estrela cheia',
+    category: 'Selos',
+    tags: ['estrela', 'destaque'],
+    svg: `<path d="m50 12 11 24 26 3-19 18 5 26-23-13-23 13 5-26-19-18 26-3Z" ${F} />`,
+  },
+
+  /* ------------------------------------------------- Formas (segunda leva) */
+  {
+    id: 'hexagono',
+    name: 'Hexágono',
+    category: 'Formas',
+    tags: ['hexágono', 'moderno'],
+    svg: `<path d="M50 10 88 30v40L50 90 12 70V30Z" ${F} />`,
+  },
+  {
+    id: 'pilula',
+    name: 'Pílula',
+    category: 'Formas',
+    tags: ['pílula', 'faixa'],
+    svg: `<rect x="10" y="34" width="80" height="32" rx="16" ${F} />`,
+  },
+  {
+    id: 'flor-forma',
+    name: 'Forma de flor',
+    category: 'Formas',
+    tags: ['flor', 'orgânico'],
+    svg: `<path d="M50 12c9 0 15 7 14 16 8-5 17-3 21 5s0 17-8 20c8 3 12 12 8 20s-13 10-21 5c1 9-5 16-14 16s-15-7-14-16c-8 5-17 3-21-5s0-17 8-20c-8-3-12-12-8-20s13-10 21-5c-1-9 5-16 14-16Z" ${F} />`,
+  },
+  {
+    id: 'gota',
+    name: 'Gota',
+    category: 'Formas',
+    tags: ['gota', 'orgânico'],
+    svg: `<path d="M50 10c18 26 30 40 30 52a30 30 0 0 1-60 0c0-12 12-26 30-52Z" ${F} />`,
+  },
+
+  /* ------------------------------------------------- Linhas (segunda leva) */
+  {
+    id: 'linha-tracejada',
+    name: 'Tracejado',
+    category: 'Linhas',
+    tags: ['tracejado', 'divisor'],
+    svg: `<path d="M8 50h84" ${T} stroke-dasharray="9 8" />`,
+  },
+  {
+    id: 'linha-ziguezague',
+    name: 'Ziguezague',
+    category: 'Linhas',
+    tags: ['ziguezague', 'divisor'],
+    svg: `<path d="M8 58 22 42l14 16 14-16 14 16 14-16 6 7" ${T} />`,
+  },
+  {
+    id: 'linha-com-ponto',
+    name: 'Linha com ponto',
+    category: 'Linhas',
+    tags: ['linha', 'divisor', 'ponto'],
+    svg: `<path d="M8 50h34M58 50h34" ${T} /><circle cx="50" cy="50" r="5" ${F} />`,
+  },
 ]

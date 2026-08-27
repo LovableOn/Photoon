@@ -5,12 +5,12 @@ import { Icon } from '../components/icons'
 import { LogoMark } from '../components/Logo'
 import { SpreadView } from '../components/editor/SpreadView'
 import { Inspector } from '../components/editor/Inspector'
+import { LayoutBar } from '../components/editor/LayoutBar'
 import { Storyboard } from '../components/editor/Storyboard'
 import {
   AssistPanel,
   BackgroundsPanel,
   ElementsPanel,
-  LayoutsPanel,
   PhotosPanel,
   TextPanel,
 } from '../components/editor/panels'
@@ -31,11 +31,11 @@ import {
 import { applyLayout, suggestLayout, type Layout } from '../lib/layouts'
 import { checkAlbum, checkSpread, spreadWidthMm, type Issue } from '../lib/checks'
 
-type PanelId = 'fotos' | 'layouts' | 'texto' | 'fundos' | 'elementos' | 'assistencia'
+/** Layouts saíram daqui: viraram barra fixa sobre o canvas. */
+type PanelId = 'fotos' | 'texto' | 'fundos' | 'elementos' | 'assistencia'
 
 const RAIL: { id: PanelId; label: string; icon: React.ReactNode }[] = [
   { id: 'fotos', label: 'Fotos', icon: <Icon.Photos className="size-[18px]" /> },
-  { id: 'layouts', label: 'Layouts', icon: <Icon.Elements className="size-[18px]" /> },
   { id: 'texto', label: 'Texto', icon: <TextIcon /> },
   { id: 'fundos', label: 'Fundos', icon: <Icon.Albums className="size-[18px]" /> },
   { id: 'elementos', label: 'Elementos', icon: <Icon.Sparkle className="size-[18px]" /> },
@@ -563,16 +563,6 @@ export function Editor() {
                 onFillEmpty={fillEmptyFrames}
               />
             )}
-            {panel === 'layouts' && (
-              <LayoutsPanel
-                spread={spread}
-                onApply={applyLayoutToCurrent}
-                onSuggest={() => {
-                  const usadas = spread.frames.filter((frame) => frame.photoId).length
-                  applyLayoutToCurrent(suggestLayout(usadas || 2))
-                }}
-              />
-            )}
             {panel === 'texto' && (
               <TextPanel
                 onInsert={(text) => {
@@ -632,6 +622,8 @@ export function Editor() {
 
         {/* canvas */}
         <main className="flex min-w-0 flex-1 flex-col">
+          {spread && <LayoutBar spread={spread} onApply={applyLayoutToCurrent} />}
+
           <div ref={areaRef} className="relative flex min-h-0 flex-1 items-center justify-center overflow-auto p-6">
             {spread && displayWidth > 0 && (
               <div className="shrink-0" style={{ width: displayWidth }}>

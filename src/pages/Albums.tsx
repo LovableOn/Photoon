@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { AppShell, PageHeader } from '../components/AppShell'
 import { Card, Chip, LinkButton, Spinner } from '../components/ui'
 import { ProjectCard } from '../components/ProjectCard'
@@ -15,8 +16,16 @@ const FILTERS: { id: ProjectStatus | 'todos'; label: string }[] = [
 
 export function Albums() {
   const { projects, isLoading } = useStore()
-  const [filter, setFilter] = useState<ProjectStatus | 'todos'>('todos')
+  const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState('')
+
+  // O filtro mora na URL: o menu lateral aponta direto para /app/albuns?status=pronto.
+  const filter = (searchParams.get('status') as ProjectStatus | null) ?? 'todos'
+
+  function setFilter(next: ProjectStatus | 'todos') {
+    if (next === 'todos') setSearchParams({}, { replace: true })
+    else setSearchParams({ status: next }, { replace: true })
+  }
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase()

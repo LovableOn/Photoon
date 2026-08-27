@@ -251,6 +251,175 @@ export function LineChart({ data, label = 'Total' }: { data: Point[]; label?: st
   )
 }
 
+/* --------------------------------------------- Duas séries na mesma escala */
+
+export interface Series {
+  label: string
+  color: string
+  points: Point[]
+}
+
+/**
+ * Duas linhas no mesmo eixo.
+ *
+ * Um eixo só, sempre: séries de grandezas diferentes iriam para gráficos
+ * separados. Aqui as duas contam fotos, então dividem a escala e a distância
+ * entre elas é a informação — o quanto da galeria já virou álbum.
+ *
+ * As cores saem da escala categórica já validada (azul e ciano: ΔE 21.3 para
+ * daltonismo). O ciano fica abaixo de 3:1 contra a superfície clara, então
+ * toda série leva rótulo direto na ponta além da legenda — nunca só a cor.
+ */
+export function MultiLineChart({ series }: { series: Series[] }) {
+  const [ref, { width, height }] = useMeasure<HTMLDivElement>()
+  const [hover, setHover] = useState<number | null>(null)
+
+  const padBottom = 24
+  const padTop = 16
+  const padRight = 46 // espaço do rótulo direto na ponta
+  const plotWidth = Math.max(10, width - padRight)
+  const plotHeight = height - padBottom
+
+  const tamanho = Math.max(...series.map((item) => item.points.length), 1)
+  const max = Math.max(1, ...series.flatMap((item) => item.points.map((p) => p.value)))
+  const step = tamanho > 1 ? plotWidth / (tamanho - 1) : plotWidth
+
+  const x = (index: number) => (tamanho > 1 ? index * step : plotWidth / 2)
+  const y = (value: number) => plotHeight - (value / max) * (plotHeight - padTop)
+
+  function onMove(event: React.MouseEvent<HTMLDivElement>) {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const index = Math.round((event.clientX - bounds.left) / step)
+    setHover(Math.max(0, Math.min(tamanho - 1, index)))
+  }
+
+  return (
+    <div className="flex h-full flex-col">
+      {/* legenda: com duas séries ela está sempre presente */}
+      <div className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-1.5">
+        {series.map((item) => (
+          <span key={item.label} className="flex items-center gap-2">
+            <span
+              className="size-2.5 rounded-full"
+              style={{ backgroundColor: item.color }}
+              aria-hidden="true"
+            />
+            <span className="text-[12px] text-ink-soft">{item.label}</span>
+            <span className="numeric text-[12px] font-semibold text-ink">
+              {item.points.at(-1)?.value ?? 0}
+            </span>
+          </span>
+        ))}
+      </div>
+
+      <div
+        ref={ref}
+        className="relative min-h-[150px] flex-1"
+        onMouseMove={onMove}
+        onMouseLeave={() => setHover(null)}
+      >
+        {width > 0 && height > 0 && (
+          <svg width={width} height={height} role="img" aria-label="Fotos liberadas e fotos no álbum ao longo do tempo">
+            <line x1={0} y1={plotHeight} x2={plotWidth} y2={plotHeight} stroke={GRID} strokeWidth={1} />
+
+            {hover !== null && (
+              <line
+                x1={x(hover)}
+                y1={padTop - 10}
+                x2={x(hover)}
+                y2={plotHeight}
+                stroke={GRID}
+                strokeWidth={1}
+              />
+            )}
+
+            {series.map((item) => {
+              const linha = item.points
+                .map((point, index) => `${x(index)},${y(point.value)}`)
+                .join(' L')
+              const ultimo = item.points.at(-1)
+
+              return (
+                <g key={item.label}>
+                  <path
+                    d={`M${linha}`}
+                    fill="none"
+                    stroke={item.color}
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+
+                  {/* rótulo direto na ponta — a identidade nunca depende só da cor */}
+                  {ultimo && (
+                    <text
+                      x={plotWidth + 6}
+                      y={y(ultimo.value) + 4}
+                      fontSize={11}
+                      fontWeight={700}
+                      fill={item.color}
+                    >
+                      {ultimo.value}
+                    </text>
+                  )}
+
+                  {hover !== null && item.points[hover] && (
+                    <g>
+                      {/* anel na cor da superfície: separa marcas sobrepostas */}
+                      <circle cx={x(hover)} cy={y(item.points[hover].value)} r={6} fill="#ffffff" />
+                      <circle cx={x(hover)} cy={y(item.points[hover].value)} r={4} fill={item.color} />
+                    </g>
+                  )}
+                </g>
+              )
+            })}
+
+            {series[0]?.points.map((point, index) => {
+              const mostrar =
+                index === 0 || index === tamanho - 1 || index === Math.floor(tamanho / 2)
+              if (!mostrar) return null
+              return (
+                <text
+                  key={point.label}
+                  x={x(index)}
+                  y={height - 6}
+                  textAnchor={index === 0 ? 'start' : index === tamanho - 1 ? 'end' : 'middle'}
+                  fontSize={11}
+                  fill={AXIS}
+                >
+                  {point.label}
+                </text>
+              )
+            })}
+          </svg>
+        )}
+
+        {hover !== null && series[0]?.points[hover] && (
+          <div
+            className="pointer-events-none absolute top-0 z-10 -translate-x-1/2 rounded-xl bg-ink px-3 py-2 text-[11px] text-white shadow-lift"
+            style={{ left: Math.max(60, Math.min(plotWidth - 60, x(hover))) }}
+          >
+            <p className="mb-1 font-semibold">{series[0].points[hover].label}</p>
+            {series.map((item) => (
+              <p key={item.label} className="flex items-center gap-2 whitespace-nowrap">
+                <span
+                  className="size-2 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                  aria-hidden="true"
+                />
+                {item.label}
+                <span className="numeric ml-auto font-semibold">
+                  {item.points[hover]?.value ?? 0}
+                </span>
+              </p>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 /* ------------------------------------------------- Composição com rótulos */
 
 export function Breakdown({

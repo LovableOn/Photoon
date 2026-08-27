@@ -118,6 +118,28 @@ export const Icon = {
       <path d="M10 12h10m0 0-3-3m3 3-3 3" />
     </svg>
   ),
+  Pencil: ({ className = 'size-5' }: IconProps) => (
+    <svg {...base} className={className}>
+      <path d="M4 20h4L19 9a2.5 2.5 0 0 0-3.5-3.5L4.5 16.5 4 20Z" />
+      <path d="m14.5 6.5 3 3" />
+    </svg>
+  ),
+  Share: ({ className = 'size-5' }: IconProps) => (
+    <svg {...base} className={className}>
+      <circle cx="17.5" cy="6" r="2.6" />
+      <circle cx="6.5" cy="12" r="2.6" />
+      <circle cx="17.5" cy="18" r="2.6" />
+      <path d="m8.9 10.8 6.4-3.5M8.9 13.2l6.4 3.5" />
+    </svg>
+  ),
+  Grid: ({ className = 'size-5' }: IconProps) => (
+    <svg {...base} className={className}>
+      <rect x="3.5" y="3.5" width="7" height="7" rx="2" />
+      <rect x="13.5" y="3.5" width="7" height="7" rx="2" />
+      <rect x="3.5" y="13.5" width="7" height="7" rx="2" />
+      <rect x="13.5" y="13.5" width="7" height="7" rx="2" />
+    </svg>
+  ),
   Bell: ({ className = 'size-5' }: IconProps) => (
     <svg {...base} className={className}>
       <path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 4 1.5 5.5 1.5 5.5H5S6.5 14 6.5 10Z" />
