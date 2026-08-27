@@ -4,6 +4,7 @@ import { Badge, Button, IconButton, Modal, Spinner, Toast } from '../components/
 import { Icon } from '../components/icons'
 import { LogoMark } from '../components/Logo'
 import { SpreadView } from '../components/editor/SpreadView'
+import { RealisticBook, type RealisticBookHandle } from '../components/editor/RealisticBook'
 import { Inspector } from '../components/editor/Inspector'
 import { LayoutBar } from '../components/editor/LayoutBar'
 import { Storyboard } from '../components/editor/Storyboard'
@@ -894,6 +895,7 @@ function Preview({
   coverAspect: number
 }) {
   const [index, setIndex] = useState(0)
+  const bookRef = useRef<RealisticBookHandle | null>(null)
   const spread = spreads[index]
 
   useEffect(() => {
@@ -903,6 +905,29 @@ function Preview({
   if (!open || !spread) return null
   const { gapX, gapY } = gapFor(spread)
   const isCover = spread.kind === 'cover'
+
+  // As lâminas internas (sem a capa) são o que o livro realista folheia —
+  // a capa é uma página só, fora da mecânica de virar página.
+  const interior = spreads.filter((item) => item.kind === 'spread')
+  const interiorIndex = index - 1
+
+  function goPrev() {
+    const targetSpread = spreads[index - 1]
+    if (spread.kind === 'spread' && targetSpread?.kind === 'spread') {
+      bookRef.current?.prev()
+    } else {
+      setIndex((value) => Math.max(0, value - 1))
+    }
+  }
+
+  function goNext() {
+    const targetSpread = spreads[index + 1]
+    if (spread.kind === 'spread' && targetSpread?.kind === 'spread') {
+      bookRef.current?.next()
+    } else {
+      setIndex((value) => Math.min(spreads.length - 1, value + 1))
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-ink/95 p-6">
@@ -916,39 +941,41 @@ function Preview({
       </div>
 
       <div className="flex min-h-0 flex-1 items-center justify-center py-6">
-        <div
-          className="max-h-full shadow-lift"
-          style={{ aspectRatio: isCover ? coverAspect : aspect, width: 'min(100%, 1100px)' }}
-        >
-          <SpreadView
-            spread={spread}
-            gapX={gapX}
-            gapY={gapY}
-            thumbUrls={thumbUrls}
-            elementUrls={elementUrls}
-            className="size-full"
-          />
+        <div className="max-h-full shadow-lift" style={{ width: 'min(100%, 1100px)' }}>
+          {isCover ? (
+            <div className="mx-auto" style={{ aspectRatio: coverAspect, height: '70vh', maxHeight: '100%' }}>
+              <SpreadView
+                spread={spread}
+                gapX={gapX}
+                gapY={gapY}
+                thumbUrls={thumbUrls}
+                elementUrls={elementUrls}
+                className="size-full"
+              />
+            </div>
+          ) : (
+            <RealisticBook
+              ref={bookRef}
+              spreads={interior}
+              index={interiorIndex}
+              onIndexChange={(nextInterior) => setIndex(nextInterior + 1)}
+              thumbUrls={thumbUrls}
+              elementUrls={elementUrls}
+              gapFor={gapFor}
+              aspect={aspect}
+            />
+          )}
         </div>
       </div>
 
       <div className="flex items-center justify-center gap-3">
-        <Button
-          variant="white"
-          size="sm"
-          onClick={() => setIndex((value) => Math.max(0, value - 1))}
-          disabled={index === 0}
-        >
+        <Button variant="white" size="sm" onClick={goPrev} disabled={index === 0}>
           Anterior
         </Button>
         <span className="numeric text-sm text-white/80">
           {index + 1} / {spreads.length}
         </span>
-        <Button
-          variant="white"
-          size="sm"
-          onClick={() => setIndex((value) => Math.min(spreads.length - 1, value + 1))}
-          disabled={index >= spreads.length - 1}
-        >
+        <Button variant="white" size="sm" onClick={goNext} disabled={index >= spreads.length - 1}>
           Próxima
         </Button>
       </div>
