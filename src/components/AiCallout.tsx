@@ -19,7 +19,65 @@ const PASSOS = [
   { titulo: 'Você ajusta', descricao: 'Tudo fica editável depois, lâmina por lâmina.' },
 ]
 
-export function AiCallout({ unusedCount }: { unusedCount: number }) {
+/**
+ * `compact`: versão vertical para dividir a linha com Galeria e Progresso na
+ * home — mesmo visual, sem a coluna de passos, que não cabe numa coluna
+ * estreita.
+ */
+export function AiCallout({
+  unusedCount,
+  compact = false,
+}: {
+  unusedCount: number
+  compact?: boolean
+}) {
+  if (compact) {
+    return (
+      <section className="relative flex h-full flex-col overflow-hidden rounded-[24px] bg-navy-deep p-6">
+        <div className="absolute inset-0 opacity-25 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.5)_1px,transparent_0)] [background-size:24px_24px]" />
+        <div className="absolute -top-16 -right-10 size-56 rounded-full bg-secondary/30 blur-3xl" />
+        <div className="absolute -bottom-20 -left-10 size-56 rounded-full bg-primary/30 blur-3xl" />
+
+        <div className="relative flex flex-1 flex-col">
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+            <Icon.Sparkle className="size-3.5" />
+            Criação assistida
+          </span>
+
+          <h2 className="mt-3.5 text-[19px] leading-tight font-bold tracking-tight text-white">
+            Deixe a Photoon montar o primeiro rascunho.
+          </h2>
+
+          <p className="mt-2.5 flex-1 text-[13px] leading-relaxed text-white/70">
+            {unusedCount > 0 ? (
+              <>
+                <strong className="font-semibold text-white">{unusedCount} fotos</strong>{' '}
+                ainda fora de um álbum — a Photoon distribui nas lâminas por você.
+              </>
+            ) : (
+              <>Escolha um produto: a Photoon distribui as fotos nas lâminas por você.</>
+            )}
+          </p>
+
+          <div className="mt-5 flex flex-col gap-2">
+            <LinkButton to="/app/albuns/novo" variant="white" size="sm">
+              <Icon.Sparkle className="size-4" />
+              Criar com IA
+            </LinkButton>
+            <LinkButton
+              to="/app/fotos"
+              variant="ghost"
+              size="sm"
+              className="border border-white/20 !text-white/80 hover:bg-white/10 hover:!text-white"
+            >
+              Escolher as fotos antes
+            </LinkButton>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="relative overflow-hidden rounded-[26px] bg-navy-deep">
       <div className="absolute inset-0 opacity-25 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.5)_1px,transparent_0)] [background-size:26px_26px]" />

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { AppShell } from '../components/AppShell'
-import { Card, LinkButton, ProgressBar, Spinner } from '../components/ui'
+import { Card, LinkButton, ProgressRing, Spinner } from '../components/ui'
 import { CATEGORICAL, MultiLineChart } from '../components/charts'
 import { ProjectCard } from '../components/ProjectCard'
 import { WelcomeHero } from '../components/WelcomeHero'
@@ -196,9 +196,10 @@ export function Dashboard() {
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-        {/* Uma seção só, com as duas linhas na mesma escala. */}
-        <Card className="flex min-h-[300px] flex-col p-6">
+      {/* Galeria, progresso e criação assistida — as três chamadas de ação
+          da home na mesma linha, para ler como um painel só. */}
+      <div className="grid gap-4 xl:grid-cols-12">
+        <Card className="flex min-h-[320px] flex-col p-6 xl:col-span-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="text-[15px] font-semibold text-ink">Sua galeria</h2>
@@ -227,30 +228,33 @@ export function Dashboard() {
           </dl>
         </Card>
 
-        {/* Progresso e próximos passos, no lugar da composição. */}
-        <Card className="flex flex-col p-6">
-          <h2 className="text-[15px] font-semibold text-ink">Progresso</h2>
-          <p className="mt-0.5 text-xs text-ink-faint">Na ordem recomendada</p>
-
-          <div className="mt-4 flex items-center gap-3">
-            <ProgressBar
+        {/* Progresso e próximos passos, com o anel carregando o número. */}
+        <Card className="flex min-h-[320px] flex-col p-6 xl:col-span-3">
+          <div className="flex items-center gap-4">
+            <ProgressRing
               value={pedido.progresso}
-              tone={pedido.progresso >= 100 ? 'success' : 'brand'}
-              className="flex-1"
-            />
-            <span className="numeric text-[13px] font-bold text-ink">
-              {Math.round(pedido.progresso)}%
-            </span>
+              size={64}
+              stroke={6}
+              className="shrink-0 text-ink"
+            >
+              <span className="numeric text-[15px] font-bold text-ink">
+                {Math.round(pedido.progresso)}%
+              </span>
+            </ProgressRing>
+            <div className="min-w-0">
+              <h2 className="text-[15px] font-semibold text-ink">Progresso</h2>
+              <p className="mt-0.5 text-xs text-ink-faint">Na ordem recomendada</p>
+            </div>
           </div>
 
-          <div className="mt-5 flex-1">
+          <div className="mt-5 flex-1 border-t border-line pt-4">
             <NextSteps steps={pedido.passos} />
           </div>
         </Card>
-      </div>
 
-      <div className="mt-4">
-        <AiCallout unusedCount={naoUsadas} />
+        <div className="xl:col-span-3">
+          <AiCallout unusedCount={naoUsadas} compact />
+        </div>
       </div>
 
       <section className="mt-10">

@@ -27,12 +27,21 @@ type Filter =
   | 'quadradas'
   | 'panoramicas'
 
-const FILTERS: { id: Filter; label: string }[] = [
+/** Origem e marcação ficam lado a lado, como segmentos; formato vira um
+ * dropdown à parte — os três facetam a mesma lista, mas misturados numa fila
+ * só de chips ficava difícil de escanear. */
+const ORIGIN_FILTERS: { id: Filter; label: string }[] = [
   { id: 'todas', label: 'Todas' },
   { id: 'loja', label: 'Da loja' },
   { id: 'minhas', label: 'Minhas' },
+]
+
+const MARK_FILTERS: { id: Filter; label: string }[] = [
   { id: 'favoritas', label: 'Favoritas' },
   { id: 'nao-usadas', label: 'Não usadas' },
+]
+
+const ORIENTATION_FILTERS: { id: Filter; label: string }[] = [
   { id: 'verticais', label: 'Verticais' },
   { id: 'horizontais', label: 'Horizontais' },
   { id: 'quadradas', label: 'Quadradas' },
@@ -361,27 +370,61 @@ export function Photos() {
           onDrop={handleDrop}
           className="relative"
         >
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            {FILTERS.map((item) => {
-              const count =
-                item.id === 'todas'
-                  ? photos.length
-                  : item.id === 'loja'
-                    ? photos.filter((photo) => photo.origin === 'loja').length
-                    : item.id === 'minhas'
-                      ? photos.filter((photo) => photo.origin === 'propria').length
-                      : undefined
-              return (
-                <Chip
+          <div className="mb-5 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-line bg-surface px-4 py-3.5">
+            <FilterGroup label="Origem">
+              {ORIGIN_FILTERS.map((item) => {
+                const count =
+                  item.id === 'todas'
+                    ? photos.length
+                    : item.id === 'loja'
+                      ? photos.filter((photo) => photo.origin === 'loja').length
+                      : photos.filter((photo) => photo.origin === 'propria').length
+                return (
+                  <SegmentButton
+                    key={item.id}
+                    active={filter === item.id}
+                    onClick={() => setFilter(item.id)}
+                  >
+                    {item.label} <span className="numeric opacity-60">{count}</span>
+                  </SegmentButton>
+                )
+              })}
+            </FilterGroup>
+
+            <span className="hidden h-8 w-px bg-line sm:block" role="presentation" />
+
+            <FilterGroup label="Marcação">
+              {MARK_FILTERS.map((item) => (
+                <SegmentButton
                   key={item.id}
                   active={filter === item.id}
-                  onClick={() => setFilter(item.id)}
+                  onClick={() => setFilter(filter === item.id ? 'todas' : item.id)}
                 >
                   {item.label}
-                  {count !== undefined && <span className="numeric opacity-60">{count}</span>}
-                </Chip>
-              )
-            })}
+                </SegmentButton>
+              ))}
+            </FilterGroup>
+
+            <span className="hidden h-8 w-px bg-line sm:block" role="presentation" />
+
+            <FilterGroup label="Formato">
+              <select
+                value={ORIENTATION_FILTERS.some((item) => item.id === filter) ? filter : 'todos'}
+                onChange={(event) =>
+                  setFilter(
+                    event.target.value === 'todos' ? 'todas' : (event.target.value as Filter),
+                  )
+                }
+                className="h-8 rounded-full bg-subtle px-3.5 text-[12px] font-semibold text-ink-soft focus:outline-none"
+              >
+                <option value="todos">Todos</option>
+                {ORIENTATION_FILTERS.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </FilterGroup>
           </div>
 
           {moments.length > 0 && (
@@ -529,6 +572,42 @@ export function Photos() {
 
       {toast && <Toast message={toast.message} tone={toast.tone} />}
     </AppShell>
+  )
+}
+
+/* --------------------------------------------------- grupo de filtros */
+
+function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="text-[11px] font-semibold tracking-[0.02em] text-ink-faint uppercase">
+        {label}
+      </span>
+      <div className="flex items-center gap-0.5 rounded-full bg-subtle p-0.5">{children}</div>
+    </div>
+  )
+}
+
+function SegmentButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex h-8 items-center gap-1 rounded-full px-3 text-[12px] font-semibold whitespace-nowrap transition ${
+        active ? 'bg-ink text-white' : 'text-ink-faint hover:bg-white hover:text-ink'
+      }`}
+    >
+      {children}
+    </button>
   )
 }
 

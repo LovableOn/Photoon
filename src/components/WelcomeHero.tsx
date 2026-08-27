@@ -1,5 +1,6 @@
 import { Avatar, LinkButton } from './ui'
 import { Icon } from './icons'
+import { heroBanner } from '../assets/heroBanner'
 
 /**
  * Entrada do painel.
@@ -62,13 +63,24 @@ export function WelcomeHero({
           className="absolute inset-0 size-full scale-105 object-cover"
         />
       ) : (
-        <div className="absolute inset-0 bg-brand" />
+        /* Sem foto da galeria ainda: a ilustração da marca substitui o
+           degradê liso, mostrando o fluxo cliente → lojista → álbum. */
+        <img
+          src={heroBanner}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 size-full object-cover"
+        />
       )}
 
       {/* Véu azul da marca, não preto: escurece o suficiente para o texto ler
           e mantém a foto com cor, em vez de apagá-la em cinza. */}
       <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/95 via-navy-deep/80 to-navy/35" />
+      {/* Mesma textura de pontos do bloco de Criação assistida, para os dois
+          blocos escuros da home lerem como a mesma família visual. */}
+      <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.5)_1px,transparent_0)] [background-size:26px_26px]" />
       <div className="absolute -top-24 -right-16 size-80 rounded-full bg-secondary/25 blur-3xl" />
+      <div className="absolute bottom-0 left-1/3 size-72 rounded-full bg-primary/20 blur-3xl" />
 
       <div className="relative flex flex-col gap-8 p-7 sm:p-9 lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:p-11">
         <div className="min-w-0 max-w-xl">

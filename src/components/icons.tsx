@@ -146,4 +146,23 @@ export const Icon = {
       <path d="M10 18.5a2 2 0 0 0 4 0" />
     </svg>
   ),
+  CheckCircle: ({ className = 'size-5' }: IconProps) => (
+    <svg {...base} className={className}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m8.3 12.3 2.6 2.6 5-5.2" />
+    </svg>
+  ),
+  Layers: ({ className = 'size-5' }: IconProps) => (
+    <svg {...base} className={className}>
+      <path d="m12 4 8 4.2-8 4.2-8-4.2Z" />
+      <path d="m4 12.4 8 4.2 8-4.2" />
+      <path d="m4 16.6 8 4.2 8-4.2" />
+    </svg>
+  ),
+  Clock: ({ className = 'size-5' }: IconProps) => (
+    <svg {...base} className={className}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3.2 2" />
+    </svg>
+  ),
 }

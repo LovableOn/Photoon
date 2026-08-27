@@ -310,6 +310,60 @@ export function ProgressBar({
   )
 }
 
+/** Anel de progresso circular — para quando o número em si é o destaque. */
+export function ProgressRing({
+  value,
+  size = 72,
+  stroke = 7,
+  className = '',
+  children,
+}: {
+  value: number
+  size?: number
+  stroke?: number
+  className?: string
+  children?: ReactNode
+}) {
+  const clamped = Math.max(0, Math.min(100, value))
+  const radius = (size - stroke) / 2
+  const circumference = 2 * Math.PI * radius
+
+  return (
+    <div className={`relative inline-flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={stroke}
+          className="text-inset"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="url(#progress-ring-gradient)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * (1 - clamped / 100)}
+          className="transition-[stroke-dashoffset] duration-700 ease-out"
+        />
+        <defs>
+          <linearGradient id="progress-ring-gradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="var(--color-primary)" />
+            <stop offset="100%" stopColor="var(--color-secondary)" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">{children}</div>
+    </div>
+  )
+}
+
 /* ------------------------------------------------------------ Estado vazio */
 
 export function EmptyState({

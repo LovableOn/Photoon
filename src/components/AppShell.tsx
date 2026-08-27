@@ -46,7 +46,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-svh bg-canvas">
       <header className="sticky top-0 z-30 border-b border-line bg-surface">
-        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:pl-28">
           <div className="flex min-w-0 items-center gap-5">
             <Link
               to="/app"

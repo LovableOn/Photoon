@@ -35,7 +35,7 @@ export function SideRail() {
   const emEdicao = projects.find((project) => project.status !== 'finalizado')
 
   const principais: RailItem[] = [
-    { to: '/app', label: 'Início', icon: <Icon.Grid className="size-5" />, end: true },
+    { to: '/app', label: 'Início', icon: <Icon.Home className="size-5" />, end: true },
     { to: '/app/albuns', label: 'Meus álbuns', icon: <Icon.Albums className="size-5" /> },
     {
       to: '/app/fotos',
@@ -57,7 +57,7 @@ export function SideRail() {
     {
       to: '/app/albuns?status=pronto',
       label: 'Prontos para finalizar',
-      icon: <Icon.Check className="size-5" />,
+      icon: <Icon.CheckCircle className="size-5" />,
       badge: prontos || undefined,
     },
   ]
@@ -101,9 +101,9 @@ export function SideRail() {
           }}
           title="Sair"
           aria-label="Sair"
-          className="mt-1 flex h-12 items-center gap-3 rounded-2xl px-3 text-danger transition hover:bg-danger-soft"
+          className="mt-1 flex h-12 items-center gap-3 rounded-2xl px-2 text-danger transition hover:bg-danger-soft"
         >
-          <span className="flex size-6 shrink-0 items-center justify-center">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-xl">
             <Icon.Logout className="size-5" />
           </span>
           <span
@@ -127,39 +127,51 @@ function RailLink({ item, aberto }: { item: RailItem; aberto: boolean }) {
       title={item.label}
       aria-label={item.label}
       className={({ isActive }) =>
-        `relative flex h-12 items-center gap-3 rounded-2xl px-3 transition ${
+        `relative flex h-12 items-center gap-3 rounded-2xl px-2 transition ${
           isActive
-            ? 'bg-brand text-white shadow-float'
+            ? 'text-ink'
             : item.tone === 'destaque'
-              ? 'text-primary hover:bg-primary-soft'
+              ? 'text-primary hover:bg-primary-soft/60'
               : 'text-ink-faint hover:bg-subtle hover:text-ink'
         }`
       }
     >
-      <span className="relative flex size-6 shrink-0 items-center justify-center">
-        {item.icon}
-        {/* Recolhido, o número flutua sobre o ícone; expandido, vira etiqueta. */}
-        {item.badge !== undefined && !aberto && (
-          <span className="absolute -top-1.5 -right-2 min-w-[19px] rounded-full bg-primary px-1 text-center text-[9px] leading-[15px] font-bold text-white">
-            {item.badge > 99 ? '99+' : item.badge}
+      {({ isActive }) => (
+        <>
+          <span
+            className={`relative flex size-8 shrink-0 items-center justify-center rounded-xl transition ${
+              isActive
+                ? 'bg-brand text-white shadow-float'
+                : item.tone === 'destaque'
+                  ? 'bg-gradient-to-br from-primary/15 to-secondary/15 text-primary'
+                  : 'bg-transparent'
+            }`}
+          >
+            {item.icon}
+            {/* Recolhido, o número flutua sobre o ícone; expandido, vira etiqueta. */}
+            {item.badge !== undefined && !aberto && (
+              <span className="absolute -top-1.5 -right-2 min-w-[19px] rounded-full bg-primary px-1 text-center text-[9px] leading-[15px] font-bold text-white">
+                {item.badge > 99 ? '99+' : item.badge}
+              </span>
+            )}
           </span>
-        )}
-      </span>
 
-      <span
-        className={`flex min-w-0 flex-1 items-center justify-between gap-2 transition-opacity duration-200 ${
-          aberto ? 'opacity-100 delay-75' : 'pointer-events-none opacity-0'
-        }`}
-      >
-        <span className="truncate text-[13px] font-semibold whitespace-nowrap">
-          {item.label}
-        </span>
-        {item.badge !== undefined && (
-          <span className="shrink-0 rounded-full bg-primary-soft px-2 py-0.5 text-[10px] font-bold text-primary">
-            {item.badge}
+          <span
+            className={`flex min-w-0 flex-1 items-center justify-between gap-2 transition-opacity duration-200 ${
+              aberto ? 'opacity-100 delay-75' : 'pointer-events-none opacity-0'
+            }`}
+          >
+            <span className="truncate text-[13px] font-semibold whitespace-nowrap">
+              {item.label}
+            </span>
+            {item.badge !== undefined && (
+              <span className="shrink-0 rounded-full bg-primary-soft px-2 py-0.5 text-[10px] font-bold text-primary">
+                {item.badge}
+              </span>
+            )}
           </span>
-        )}
-      </span>
+        </>
+      )}
     </NavLink>
   )
 }
