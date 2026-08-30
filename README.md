@@ -35,6 +35,43 @@ sobrevive a um recarregamento sem suporte do servidor. O flag `--fragment` gera
 a mesma coisa sem `<html>`, `<head>` e `<body>`, para hosts que fornecem o
 invólucro.
 
+## Publicando numa VPS
+
+Um comando, da sua máquina, com acesso ssh já configurado:
+
+```bash
+./deploy/deploy-vps.sh usuario@ip-da-vps
+```
+
+Ele instala as dependências, roda o build e envia o `dist/` para
+`/var/www/photoon` (o segundo argumento troca a pasta), depois recarrega o
+nginx.
+
+Da primeira vez, instale o nginx e o server block que está em
+`deploy/nginx-photoon.conf`:
+
+```bash
+ssh usuario@ip 'sudo apt update && sudo apt install -y nginx rsync'
+scp deploy/nginx-photoon.conf usuario@ip:/tmp/
+ssh usuario@ip 'sudo mv /tmp/nginx-photoon.conf /etc/nginx/sites-available/photoon \
+  && sudo ln -sf /etc/nginx/sites-available/photoon /etc/nginx/sites-enabled/photoon \
+  && sudo rm -f /etc/nginx/sites-enabled/default \
+  && sudo nginx -t && sudo systemctl reload nginx'
+```
+
+### Quando o deploy novo mostra os dados antigos
+
+São duas causas, as duas tratadas aqui:
+
+- **O app antigo, vindo do cache.** O `index.html` é quem aponta para os
+  assets novos; o server block manda `Cache-Control: no-cache` nele e o script
+  apaga do servidor os arquivos que sumiram do build (`rsync --delete`).
+- **O acervo antigo, guardado no navegador.** Fotos, elementos e álbuns ficam
+  no IndexedDB do dispositivo, e um deploy não encosta neles. Suba o
+  `DB_VERSION` em `src/lib/db.ts` ao publicar uma versão que não deve herdar o
+  acervo anterior: na primeira abertura o banco é recriado e a galeria da loja
+  é semeada de novo.
+
 ## O que já funciona
 
 **Acesso**

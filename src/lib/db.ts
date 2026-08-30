@@ -11,7 +11,12 @@
  */
 
 const DB_NAME = 'photoon'
-const DB_VERSION = 1
+/**
+ * Suba este número ao publicar uma versão que não deve herdar o acervo antigo.
+ * O navegador guarda fotos, elementos e álbuns por dispositivo: sem isso, um
+ * deploy novo continua abrindo com os dados do deploy anterior.
+ */
+const DB_VERSION = 2
 
 export const STORES = ['photos', 'elements', 'projects'] as const
 export type StoreName = (typeof STORES)[number]
@@ -44,10 +49,11 @@ function openDb(): Promise<IDBDatabase | null> {
 
     request.onupgradeneeded = () => {
       const db = request.result
+      // Acervo de versão anterior sai fora: as fotos da loja são semeadas de
+      // novo no primeiro acesso, já no formato desta versão.
       for (const store of STORES) {
-        if (!db.objectStoreNames.contains(store)) {
-          db.createObjectStore(store, { keyPath: 'id' })
-        }
+        if (db.objectStoreNames.contains(store)) db.deleteObjectStore(store)
+        db.createObjectStore(store, { keyPath: 'id' })
       }
     }
 
